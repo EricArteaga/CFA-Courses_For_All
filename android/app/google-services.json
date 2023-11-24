@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "725088718546",
+    "project_id": "cfa---courses-for-all",
+    "storage_bucket": "cfa---courses-for-all.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725088718546:android:a718642f19d22e0239270b",
+        "android_client_info": {
+          "package_name": "com.example.cfa_coursesforall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXdMdVLQW1bYo4hamfCK3YAACjjOpvZXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725088718546:android:502306f3f808d94e39270b",
+        "android_client_info": {
+          "package_name": "com.example.coursesforall"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXdMdVLQW1bYo4hamfCK3YAACjjOpvZXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
