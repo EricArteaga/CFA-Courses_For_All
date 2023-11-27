@@ -11,9 +11,14 @@ class _SignUpProfesorState extends State<SignUpProfesor>{
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: 50, horizontal: 20),
-        child: Center (
+
+    // size ayuda a mantener una relación responsive con la pantalla
+    final size = MediaQuery.of(context).size;
+
+    return Scaffold(
+        body: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(vertical: size.width * 0.1, horizontal: size.width * 0.1),
+          child: Center (
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: const [
@@ -54,7 +59,8 @@ class _SignUpProfesorState extends State<SignUpProfesor>{
                   ),
                   SizedBox(height: 20),
                 ]
-            )
+              )
+          )
         )
     );
   }

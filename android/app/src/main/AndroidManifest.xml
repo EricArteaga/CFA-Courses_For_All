@@ -1,4 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET" /><!-- Añadido -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /><!-- Añadido -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" /><!-- Añadido -->
     <application
         android:label="cfa_coursesforall"
         android:name="${applicationName}"

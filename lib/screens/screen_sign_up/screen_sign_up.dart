@@ -14,40 +14,40 @@ class ScreenSingUp extends StatefulWidget{
 }
 
 class ScreenSingUpState extends State<ScreenSingUp>{
-  int selectedIndex = 0;
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final screens = [
+    final _colors = Theme.of(context).colorScheme;
+    final _screens = [
       const SignUpAlumno(),
       const SignUpProfesor(),
     ];
     return Scaffold(
       appBar: headerBar(),
       body:  IndexedStack(
-        index: selectedIndex,
-        children: screens,
+        index: _selectedIndex,
+        children: _screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         elevation: 0,
-        currentIndex: selectedIndex,
+        currentIndex: _selectedIndex,
         onTap: (int index){
              setState(() {
-            selectedIndex = index;
+            _selectedIndex = index;
           });
         },
         items: [
           BottomNavigationBarItem(
             icon: const Icon(Icons.person),
             label: "Crear Alumno",
-            backgroundColor: colors.primary
+            backgroundColor: _colors.primary
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.supervisor_account),
             label: "Crear Profesor",
-            backgroundColor: colors.primary
+            backgroundColor: _colors.primary
           ),
         ],
       ),
