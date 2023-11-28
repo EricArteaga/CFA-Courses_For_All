@@ -53,13 +53,15 @@ class ScreenSingUpState extends State<ScreenSingUp>{
       ),
     );
   }
+
+  // Barra de arriba
+  PreferredSizeWidget headerBar() {
+    return AppBar(
+      title: Text("Crear cruenta"),
+
+    );
+  }
 }
 
-// Barra de arriba
-PreferredSizeWidget headerBar() {
-  return AppBar(
-    title: Text("Crear cruenta"),
 
-  );
-}
 

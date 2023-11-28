@@ -20,7 +20,6 @@ class _noSignedInState extends State<noSignedIn> {
     );
   }
 
-
 // Barra de arriba
   PreferredSizeWidget headerBar() {
     return AppBar(
