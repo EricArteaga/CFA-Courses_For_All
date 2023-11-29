@@ -15,6 +15,7 @@ class _SignUpProfesorState extends State<SignUpProfesor>{
     // size ayuda a mantener una relación responsive con la pantalla
     final size = MediaQuery.of(context).size;
 
+    // TODO: Diseñar la creación de usuario profesor (mirar que atributos quiero guardar)
     return Scaffold(
         body: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: size.width * 0.1, horizontal: size.width * 0.1),

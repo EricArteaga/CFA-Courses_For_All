@@ -1,9 +1,7 @@
 import 'package:cfa_coursesforall/screens/screen_no_signed_in.dart';
-import 'package:cfa_coursesforall/screens/screen_sign_in.dart';
 import 'package:cfa_coursesforall/screens/screen_singed_up.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'screens/screen_sign_up/screen_sign_up.dart';
 
 // Imports de Firebase
 import 'package:firebase_core/firebase_core.dart';
@@ -26,7 +24,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override
@@ -44,7 +42,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, }) : super(key: key);
+  const MyHomePage({super.key, });
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -58,9 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
       body: StreamBuilder<User?>(
         stream: auth.authStateChanges(),
         builder: (context, snapshot) {
+          // El usuario ha iniciado sesión
           if (snapshot.hasData) {
             return signedIn();
-          } else {
+          }
+          // El usuario no ha iniciado sesión
+          else {
             return noSignedIn();
           }
         },

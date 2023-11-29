@@ -198,6 +198,23 @@ class _SignUpAlumnoState extends State<SignUpAlumno>{
         "password": _password,
       };
 
+
+      // TODO: Añadir un createUserWithEmailAndPassword()
+      try {
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: _email,
+          password: _password,
+        );
+      } on FirebaseAuthException catch (e) {
+        if (e.code == 'weak-password') {
+          print('The password provided is too weak.');
+        } else if (e.code == 'email-already-in-use') {
+          print('The account already exists for that email.');
+        }
+      } catch (e) {
+        print(e);
+      }
+
       // Lo guardamos en FireStore
       await createAlumno(alumno);
       FirebaseAuth.instance

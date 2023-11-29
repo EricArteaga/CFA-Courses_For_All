@@ -1,4 +1,4 @@
-import 'package:cfa_coursesforall/screens/screen_sign_in.dart';
+import 'package:cfa_coursesforall/screens/login_screen.dart';
 import 'package:cfa_coursesforall/screens/screen_sign_up/screen_sign_up.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -35,32 +35,45 @@ class _noSignedInState extends State<noSignedIn> {
             backgroundBlendMode: BlendMode.colorDodge,
             color: Colors.black
         ),
-        child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: textoBienvenida(),
+        child: SafeArea(
+          child: Center(
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+
+                    // Icono de la aplicación
+                    const Icon(
+                        Icons.lock,
+                        size: 100
+                    ),
+
+                    const SizedBox(height: 100,),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      child: textoBienvenida(),
+                    ),
+                    const SizedBox(height: 15,),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      child: boton_sing_up(),
+                    ),
+                    const SizedBox(height: 15,),
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+                      child: boton_sing_in(),
+                    ),
+                  ],
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: boton_sing_up(),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                  child: boton_sing_in(),
-                ),
-              ],
-            )
+              )
+          ),
         )
     );
   }
 
   Widget textoBienvenida() {
     return const Text(
-      "Bienvenido a Courses For All.", style: TextStyle(fontSize: 25),);
+      "Bienvenido a Courses For All.", style: TextStyle(fontSize: 20),);
   }
 
 // Boton Sing Up
@@ -86,7 +99,7 @@ class _noSignedInState extends State<noSignedIn> {
 // ? Acción de Boton Sing In
   void presionarSingIn() {
     Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ScreenSignIn()));
+        MaterialPageRoute(builder: (context) => login_screen()));
   }
 
 // Style ButtonStyle
