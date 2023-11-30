@@ -2,82 +2,86 @@
 
 import 'package:cfa_coursesforall/components/my_button.dart';
 import 'package:cfa_coursesforall/components/my_textfield.dart';
+import 'package:cfa_coursesforall/components/my_wrong_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../tools/error_messages.dart';
-
-class login_screen extends StatefulWidget {
-  const login_screen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<login_screen> createState() => _login_screenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _login_screenState extends State<login_screen> {
+class _LoginScreenState extends State<LoginScreen> {
+
   @override
   Widget build(BuildContext context) {
 
     // size ayuda a mantener una relación responsive con la pantalla
-    final size = MediaQuery.of(context).size;
+    //final size = MediaQuery.of(context).size;
 
     // Estado del formulario
     final formKey = GlobalKey<FormState>();
 
     // Valores del formulario
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
+    final _emailController = TextEditingController();
+    final _passwordController = TextEditingController();
 
-    // bool validateAndSave(){
-    //   final form = formKey.currentState;
-    //   dynamic val = form?.validate();
-    //   if(val == true){
-    //     form!.save();
-    //     print('El formulario es válido.  Email: $_email, password: $_password');
-    //   }else if(val == false) {
-    //     print('El formulario es inválido. Email: $_email, password: $_password');
-    //   }
-    //   return val;
-    // }
+    bool validateAndSave(){
+      final form = formKey.currentState;
+      dynamic val = form?.validate();
+      if(val == true){
+        form!.save();
+        print('El formulario es válido.  Email: ${_emailController.text}, password: ${_passwordController.text}');
+      }else if(val == false) {
+        print('El formulario es inválido. Email: ${_emailController.text}, password: ${_passwordController.text}');
+      }
+      return val;
+    }
 
-     signUserIn() async{}
-    //   if(validateAndSave()){
-    //     // Se muestra el circulo de carga
-    //     showDialog(
-    //         context: context,
-    //         builder: (context){
-    //           return const Center(
-    //             child: CircularProgressIndicator(),
-    //           );
-    //         }
-    //     );
-    //
-    //     // TODO: Solucionar esto
-    //     //  Cuando el email y la contraseña no son correctas tira el siguiente
-    //     //  error:
-    //     //  exception - The supplied auth credential is incorrect, malformed or
-    //     //  has expired.
-    //     // lo que hace que no muestre los mensajes de error...
-    //     try{
-    //       final userCredentials = await FirebaseAuth.instance.signInWithEmailAndPassword(
-    //           email: _email.trim(),
-    //           password: _password.trim()
-    //       );
-    //       print("ID del usuario iniciado: ${userCredentials.user!.uid}");
-    //       // Se quita el circulo de carga
-    //       Navigator.pop(context);
-    //     }on FirebaseAuthException catch(e) {
-    //       // Se quita el circulo de carga
-    //       Navigator.pop(context);
-    //
-    //       if(e.code == 'user-not-found'){
-    //         wrongEmailMessage(context);
-    //       }else if(e.code == "wrong-password"){
-    //         wrongPasswordMessage(context);
-    //       }
-    //     }
-    //   }
-    // }
+     signUserIn() async{
+      if(validateAndSave()){
+        // Se muestra el circulo de carga
+        showDialog(
+            context: context,
+            builder: (context){
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+        );
+
+        // TODO: Solucionar esto
+        // Cuando el email y la contraseña no son correctas tira el siguiente
+        // error:
+        // exception - The supplied auth credential is incorrect, malformed or
+        // has expired.
+        // lo que hace que no muestre los mensajes de error...
+        try{
+          final userCredentials = await FirebaseAuth.instance.signInWithEmailAndPassword(
+              email: _emailController.text.trim(),
+              password: _passwordController.text.trim()
+          );
+          print("ID del usuario iniciado: ${userCredentials.user!.uid}");
+          // Se quita el circulo de carga
+          Navigator.pop(context);
+        }on FirebaseAuthException catch(e) {
+          // Se quita el circulo de carga
+          Navigator.pop(context);
+
+          if(e.code == "user-not-found"){
+            wrongEmailMessage();
+          }else if(e.code == "wrong-password"){
+            wrongPasswordMessage();
+          }else if(e.code == "invalid-email"){
+            invalidMessageMessage();
+          }else if(e.code == "invalid-credential"){
+            invalidCredentialMessage();
+          }
+        }
+      }
+    }
 
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -89,7 +93,7 @@ class _login_screenState extends State<login_screen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children:  [
-                const SizedBox(height: 10,),
+                const SizedBox(height: 50,),
 
                 // Logo
                 CircleAvatar(
@@ -120,18 +124,46 @@ class _login_screenState extends State<login_screen> {
 
                 // Campo email
                 MyTextFormField(
-                  controller: emailController,
-                  obscureText: false,
+                  controller: _emailController,
+                  autofocus: true,
                   labelText: "Email",
+                  onSaved: (value) {
+                    if(value != null) {
+                      _emailController.text = value;
+                    }
+                  },
+                  validator: (value) {
+                    if(value == null) {
+                      return 'El Email no puede estar vacio';
+                    } else if(value.isEmpty) {
+                      return 'El Email no puede estar vacio';
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
 
                 const SizedBox(height: 10,),
 
                 // Campo contraseña
                 MyTextFormField(
-                  controller: passwordController,
+                  controller: _passwordController,
                   obscureText: true,
                   labelText: "Contraseña",
+                  onSaved: (value) {
+                    if(value != null) {
+                      _passwordController.text = value;
+                    }
+                  },
+                  validator: (value) {
+                    if(value == null) {
+                      return 'La contraseña no puede estar vacio';
+                    } else if(value.isEmpty) {
+                      return 'La contraseña no puede estar vacio';
+                    } else {
+                      return null;
+                    }
+                  },
                 ),
 
                 const SizedBox(height: 15,),
@@ -165,6 +197,64 @@ class _login_screenState extends State<login_screen> {
           )
         ),
       )
+    );
+  }
+
+  // Los errores están declarados aquí en vez de en el método signUserIn
+  // por la recomendación:
+  // <<Don't use 'BuildContext's across async gaps>>
+  // Esto se debe a que se necesita el BuildContext de la ventana para enseñar
+  // el mensaje de error.
+
+
+  // Mensaje de email incorrecto
+  void wrongEmailMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Email incorrecto",
+              content: "Por favor, introduce un email que pertenezca a una cuenta"
+          );
+        }
+    );
+  }
+
+  void wrongPasswordMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Email incorrecto",
+              content: "Por favor, introduce un email que pertenezca a una cuenta"
+          );
+        }
+    );
+  }
+
+  void invalidMessageMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Email invalido",
+              content: "El email es invalido, asegurate que lo has escrito bien"
+          );
+        }
+    );
+  }
+
+  void invalidCredentialMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Vaya... invalid-credential",
+              content: "Si te ha salido esto es porque ha saltado un error de "
+                  "invalid-credential, un error provocado por algo desconocido "
+                  "a los conocimientos del programador ;-;"
+          );
+        }
     );
   }
 }
