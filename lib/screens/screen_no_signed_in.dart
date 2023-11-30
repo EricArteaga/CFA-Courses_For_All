@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:cfa_coursesforall/components/my_button.dart';
 import 'package:cfa_coursesforall/screens/login_screen.dart';
 import 'package:cfa_coursesforall/screens/screen_sign_up/screen_sign_up.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +18,7 @@ class _noSignedInState extends State<noSignedIn> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: headerBar(),
       body: body(context),
     );
@@ -29,94 +33,68 @@ class _noSignedInState extends State<noSignedIn> {
 
 // Body
   Widget body(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-        decoration: const BoxDecoration(
-            backgroundBlendMode: BlendMode.colorDodge,
-            color: Colors.black
+    return SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const SizedBox(height: 50,),
+
+            // Logo
+            CircleAvatar(
+              radius: 100.0,
+              backgroundColor: Colors.grey[500],
+              backgroundImage: AssetImage('lib/images/Logo_CFA.png'),
+            ),
+
+            const SizedBox(height: 50,),
+
+            Text("Bienvenido a ",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 10,),
+
+            textoBienvenida(),
+
+            const SizedBox(height: 25,),
+
+            MyButton(
+                text: "Crear Cuenta",
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(
+                          builder: (context) => ScreenSingUp()));
+                }
+            ),
+
+            const SizedBox(height: 25,),
+
+            MyButton(
+                text: "Iniciar Sesión",
+                onTap: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(
+                          builder: (context) => login_screen()));
+                }
+            ),
+          ],
         ),
-        child: SafeArea(
-          child: Center(
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-
-                    // Icono de la aplicación
-                    const Icon(
-                        Icons.lock,
-                        size: 100
-                    ),
-
-                    const SizedBox(height: 100,),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      child: textoBienvenida(),
-                    ),
-                    const SizedBox(height: 15,),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      child: boton_sing_up(),
-                    ),
-                    const SizedBox(height: 15,),
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                      child: boton_sing_in(),
-                    ),
-                  ],
-                ),
-              )
-          ),
-        )
+      ),
     );
   }
 
   Widget textoBienvenida() {
     return const Text(
-      "Bienvenido a Courses For All.", style: TextStyle(fontSize: 20),);
-  }
-
-// Boton Sing Up
-  Widget boton_sing_up() {
-    return ElevatedButton(child: Text("Crear cuenta",),
-        style: estiloBoton(),
-        onPressed: () => presionarSingUp());
-  }
-
-// Boton Sing In
-  Widget boton_sing_in() {
-    return ElevatedButton(child: Text("Iniciar sesión",),
-        style: estiloBoton(),
-        onPressed: () => presionarSingIn());
-  }
-
-// ? Acción de Boton Sing Up
-  void presionarSingUp() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => ScreenSingUp()));
-  }
-
-// ? Acción de Boton Sing In
-  void presionarSingIn() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => login_screen()));
-  }
-
-// Style ButtonStyle
-  ButtonStyle estiloBoton() {
-    return ButtonStyle(
-      backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-            (Set<MaterialState> states) {
-          if (states.contains(MaterialState.pressed)) {
-            return Theme
-                .of(context)
-                .colorScheme
-                .primary
-                .withOpacity(0.5);
-          }
-          return null; // Use the component's default.
-        },
+      " Courses For All",
+      style: TextStyle(
+        fontSize: 25,
+        fontWeight: FontWeight.bold,
       ),
     );
   }
+
 }
