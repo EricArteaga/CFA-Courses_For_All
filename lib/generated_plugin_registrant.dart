@@ -1,5 +1,5 @@
 //
-// Generated file. Do not edit.
+// Generated file. Do not edit. <- Como me dice que no lo puedo editar, y por ende, eliminar, lo dejo así
 //
 
 // ignore_for_file: directives_ordering

@@ -1,22 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class signedIn extends StatefulWidget{
-  const signedIn({super.key });
-
-  @override
-  State<signedIn> createState() => _signedInState();
-}
-
-class _signedInState extends State<signedIn> {
+class SignedIn extends StatelessWidget{
 
   final user = FirebaseAuth.instance.currentUser!;
 
   //Datos del usuario
-  //String _nombre = "";
   String _email = "";
-  //String _foto = "";
 
+  //String _foto = "";
   void obetenerDatosDelUsuario(){
     _email = user.email!;
     //_nombre = user.displayName!;
@@ -42,7 +34,7 @@ class _signedInState extends State<signedIn> {
     return Scaffold(
       appBar: appBar(),
       // TODO: Hacer el Scaffold de cuando has hecho el login de la app
-      body: Center(child: Text("Logged in as:" + _email!))
+      body: Center(child: Text("Logged in as: $_email"))
     );
   }
 }

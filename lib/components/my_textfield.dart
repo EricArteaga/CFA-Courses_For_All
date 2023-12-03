@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
 
-/* *
-*  MyTextField te crea un campo de formulario
-*
-*
-* */
+/*
+ *  MyTextField te crea un campo de formulario
+ */
 class MyTextFormField extends StatelessWidget{
   final TextEditingController controller;
   final String labelText;
-  final bool obscureText;
+  final bool? obscureText;
+  final Function(String?)? onSaved;
+  final String? Function(String?)? validator;
+  final bool? autofocus;
 
   const MyTextFormField({
     super.key,
     required this.controller,
     required this.labelText,
-    required this.obscureText,
+    this.obscureText,
+    required this.onSaved,
+    required this.validator,
+    this.autofocus,
   });
 
   @override
@@ -24,7 +28,8 @@ class MyTextFormField extends StatelessWidget{
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: TextFormField(
         controller: controller,
-        obscureText: obscureText,
+        obscureText: obscureTextCorrect(this.obscureText),
+        autofocus: autofocusCorrect(this.autofocus),
         decoration: InputDecoration(
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
@@ -36,12 +41,21 @@ class MyTextFormField extends StatelessWidget{
           filled: true,
           labelText: labelText,
         ),
+        onSaved: onSaved,
+        validator: validator,
       ),
     );
   }
 }
 
-    // onSaved: (value) {
+bool obscureTextCorrect(bool? obscureText){
+  return obscureText == null ? false : obscureText;
+}
+
+bool autofocusCorrect(bool? autofocus){
+  return autofocus == null ? false : autofocus;
+}
+// onSaved: (value) {
     //       if(value != null) {
     //         _email = value;
     //       }
