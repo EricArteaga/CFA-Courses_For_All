@@ -597,10 +597,10 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
           );
 
           /*
-            Se crea en la colección alumno un usuario con sus datos del fomulario,
-            y lo más importante, con un ID del documento igual al ID de usuario
-            del Authentication.
-          */
+           * Se crea en la colección alumno un usuario con sus datos del fomulario,
+           * y lo más importante, con un ID del documento igual al ID de usuario
+           * del Authentication.
+           */
           // TODO: Implementar con userCredential.additionalUserInfo.isNewUser un método que te muestre un mensaje de nuevo usuario al iniciar la aplicación
           String? uid = userCredential.user?.uid;
           await createAlumno(alumno, uid);

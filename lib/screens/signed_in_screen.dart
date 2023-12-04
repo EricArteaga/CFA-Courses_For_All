@@ -32,7 +32,7 @@ class _SignedInState extends State<SignedIn> {
     obetenerDatosDelUsuario();
 
     // Declaración del Scaffold
-    return primerScaffold();
+    return teacherScaffold();
   }
 
   // Método para quitar el usuario
@@ -50,12 +50,14 @@ class _SignedInState extends State<SignedIn> {
     );
   }
 
-  // Método que te devuelve un scaffold con una lista de ListTile con los cursos
-  // creados
-  Scaffold primerScaffold(){
+  // TODO: Hacer que este scaffold solo te muestre tus cursos creados
+  // Método que te devuelve un scaffold con todos los cursos creados
+  Scaffold teacherScaffold(){
     return Scaffold(
       appBar: appBar(),
       backgroundColor: Colors.grey[300],
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: createFloatingActionButton(),
       body: SafeArea(
         child: FutureBuilder(
           future: getCursos(),
@@ -84,6 +86,20 @@ class _SignedInState extends State<SignedIn> {
           ),
         ),
       )
+    );
+  }
+
+  // Método que devuelve un floatingActionButton para crear cursos
+  FloatingActionButton createFloatingActionButton(){
+    return FloatingActionButton(
+      shape: const CircleBorder(),
+      backgroundColor: Colors.green[500],
+      child: const Icon(Icons.add, size: 40,),
+      elevation: 30.0,
+      // Método que te abre la ventana de crear cursos
+      onPressed: (){
+
+      },
     );
   }
 }
