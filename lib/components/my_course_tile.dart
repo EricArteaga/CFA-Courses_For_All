@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+import '../services/firebase_service.dart';
 import 'my_list_tile.dart';
 
 class MyCourseTile extends StatelessWidget{
@@ -24,38 +25,54 @@ class MyCourseTile extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
-    return Slidable(
-      endActionPane: ActionPane(
-          motion: StretchMotion(),
-          children: [
-            // Opción de editar
-            SlidableAction(
-              onPressed: editCourse,
-              backgroundColor: Colors.grey.shade800,
-              icon: Icons.settings,
-            ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+      child: Slidable(
+        endActionPane: ActionPane(
+            motion: StretchMotion(),
+            children: [
+              // Opción de editar
+              SlidableAction(
+                onPressed: editCourse,
+                backgroundColor: Colors.grey.shade800,
+                icon: Icons.settings,
+                borderRadius: BorderRadius.circular(10),
+              ),
 
-            // Opción de borrar
-            SlidableAction(
-              onPressed: deleteCourse,
-              backgroundColor: Colors.red.shade500,
-              icon: Icons.delete,
-            ),
-          ]
-      ),
-      child: MyListTile(
-
-        // Aquí estaría la imagen del curso
-        image: CircleAvatar(
-          radius: 30.0,
-          backgroundColor: Colors.grey[500],
-          backgroundImage: const AssetImage('lib/images/Logo_CFA.png'),
+              // Opción de borrar
+              SlidableAction(
+                onPressed: deleteCourse,
+                backgroundColor: Colors.red.shade500,
+                icon: Icons.delete,
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ]
         ),
-        title: title,
-        duration: duration,
-        onTap: onTap,
-        teacherName: "Paco", // Hay que llamar al método que te busca el nombre
-        language: language,
+        child: FutureBuilder(
+          future: getProfesorById(teacherID),
+          builder: (context, snapshot) {
+            if(snapshot.hasData){
+              return MyListTile(
+
+                // Aquí estaría la imagen del curso
+                image: CircleAvatar(
+                  radius: 30.0,
+                  backgroundColor: Colors.grey[500],
+                  backgroundImage: const AssetImage('lib/images/Logo_CFA.png'),
+                ),
+                title: title,
+                duration: duration,
+                onTap: onTap,
+                teacherName:  snapshot.data?["name"],
+                language: language,
+              );
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }
+        ),
       ),
     );
   }
@@ -69,8 +86,5 @@ class MyCourseTile extends StatelessWidget{
   void editCourse(BuildContext context){
 
   }
-
-  // Método que mediante el atributo de clase "final String teacher_i"
-  // te busca su nombre en la coleccion firestore (controlar excepciones)
 
 }

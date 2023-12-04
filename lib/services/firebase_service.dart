@@ -23,24 +23,30 @@ Future<List> getAlumnos() async{
 // ? CREATE Alumno
 Future<void> createAlumno(Map<String, dynamic> alumno, String? uid) async{
   CollectionReference collectionReferenceAlumno = db.collection('alumno');
-  await collectionReferenceAlumno.doc(uid).set(alumno);
+  await collectionReferenceAlumno
+      .doc(uid)
+      .set(alumno);
 }
 
 //? UPDATE Alumno
 Future<void> updateAlumno(String id, Map<String, dynamic> alumno) async{
   CollectionReference collectionReferenceAlumno = db.collection('alumno');
-  await collectionReferenceAlumno.doc(id).update(alumno);
+  await collectionReferenceAlumno
+      .doc(id)
+      .update(alumno);
 }
 
 //? DELETE Alumno
 Future<void> deleteAlumno(String id) async{
   CollectionReference collectionReferenceAlumno = db.collection('alumno');
-  await collectionReferenceAlumno.doc(id).delete();
+  await collectionReferenceAlumno
+      .doc(id)
+      .delete();
 }
 
 // End CRUD de la colección Alumno
 // Region CRUD de la colección Profesor
-// ? GET Profesor
+// ? GET Profesores
 Future<List> getProfesores() async{
   List profesores = [];
   CollectionReference collectionReferenceProfesores = db.collection('profesor');
@@ -56,6 +62,22 @@ Future<List> getProfesores() async{
   return profesores;
 }
 
+// ? GET Profesores
+Future<Map<String, dynamic>?> getProfesorById(String teacherID) async {
+  dynamic profesor;
+  DocumentSnapshot profesorSnapshot = await db
+      .collection('profesor')
+      .doc(teacherID)
+      .get();
+
+  if (profesorSnapshot.exists) {
+    // El profesor existe, devuelve sus datos como un mapa
+    return profesorSnapshot.data() as Map<String, dynamic>;
+  } else {
+    // El profesor no existe
+    return null;
+  }
+}
 // ? CREATE Profesor
 Future<void> createProfesor(Map<String, dynamic> profesor, String? uid) async{
   CollectionReference collectionReferenceProfesor = db.collection('profesor');
