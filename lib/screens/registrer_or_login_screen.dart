@@ -67,6 +67,9 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
     // size ayuda a mantener una relación responsive con la pantalla
     //final size = MediaQuery.of(context).size;
 
+    // En base a indexScaffold te cambia de scaffold (de ventana), ya que esa
+    // variable se modifica dentro de un setState() en los onTap() de los botones
+    // de cambiar de ventana
     switch(indexSccafold){
       case "Login":
         return loginScaffold();
@@ -580,7 +583,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
           "password": _passwordSUAlumnoController.text.trim(),
         };
 
-        // TODO: Hacer que el email introducido sea un valido real
+        // TODO: Hacer que el email introducido sea uno valido real
         /*
           (En una de las prueba se introdujo manuelisorna@gmail.comskeje como email
           y se dio por válido.)
