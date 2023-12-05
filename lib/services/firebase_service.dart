@@ -62,7 +62,7 @@ Future<List> getProfesores() async{
   return profesores;
 }
 
-// ? GET Profesores
+// ? GET Profesor By ID
 Future<Map<String, dynamic>?> getProfesorById(String teacherID) async {
   dynamic profesor;
   DocumentSnapshot profesorSnapshot = await db

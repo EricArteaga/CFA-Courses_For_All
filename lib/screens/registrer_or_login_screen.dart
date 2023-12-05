@@ -73,13 +73,10 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
     switch(indexSccafold){
       case "Login":
         return loginScaffold();
-        break;
       case "SignUpAlumno":
         return signUpSccafold();
-        break;
       default:
         return loginScaffold();
-        break;
     }
   }
 
@@ -196,7 +193,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
                         // Botón de iniciar sesión
                         MyButton(
                           text: "Iniciar sesión",
-                          onTap: LoginUser,
+                          onTap: loginUser,
                         ),
 
                         const SizedBox(height: 25,),
@@ -266,7 +263,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
     return val;
   }
 
-  LoginUser() async {
+  loginUser() async {
     if (validateAndSaveLogin()) {
       // Se muestra el circulo de carga
       showDialog(
@@ -380,7 +377,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
 
                     // Texto crear cuenta
                     const Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      padding: EdgeInsets.symmetric(horizontal: 25.0),
                       child: Text(
                         "Crear cuenta para",
                         style: TextStyle(
@@ -391,7 +388,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
                     ),
 
                     const Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                      padding: EdgeInsets.symmetric(horizontal: 25.0),
                       child: Text(
                         "Alumno",
                         style: TextStyle(
@@ -770,7 +767,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
 
                     ),
 
-                    SizedBox(height: 30,),
+                    const SizedBox(height: 30,),
 
                     // Boton de crear cuenta
                     MyButton(

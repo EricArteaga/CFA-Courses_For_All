@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SignedIn extends StatefulWidget{
+  const SignedIn({super.key});
 
   @override
   State<SignedIn> createState() => _SignedInState();
@@ -45,7 +46,7 @@ class _SignedInState extends State<SignedIn> {
     return AppBar(
       title: Center(child: Text("Logged in as: $_email")),
       actions: [
-        IconButton(onPressed: signUserOut, icon: Icon(Icons.logout)),
+        IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout)),
       ],
     );
   }
@@ -71,6 +72,7 @@ class _SignedInState extends State<SignedIn> {
                     duration: snapshot.data?[index]["duracion"],
                     teacherID: snapshot.data?[index]["profesor_id"],
                     language: snapshot.data?[index]["idioma"],
+                    imageURL: snapshot.data?[index]["imagenURL"],
                     // TODO: Se debe implementar un método que te abra la ventana para ver ese curso en especifico
                     onTap: (){
                     },

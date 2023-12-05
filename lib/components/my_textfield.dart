@@ -10,6 +10,7 @@ class MyTextFormField extends StatelessWidget{
   final Function(String?)? onSaved;
   final String? Function(String?)? validator;
   final bool? autofocus;
+  final bool? enabled;
 
   const MyTextFormField({
     super.key,
@@ -19,6 +20,7 @@ class MyTextFormField extends StatelessWidget{
     required this.onSaved,
     required this.validator,
     this.autofocus,
+    this.enabled,
   });
 
   @override
@@ -28,8 +30,9 @@ class MyTextFormField extends StatelessWidget{
       padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: TextFormField(
         controller: controller,
-        obscureText: obscureTextCorrect(this.obscureText),
-        autofocus: autofocusCorrect(this.autofocus),
+        obscureText: obscureTextCorrect(obscureText),
+        autofocus: autofocusCorrect(autofocus),
+        enabled: enabled,
         decoration: InputDecoration(
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
@@ -55,18 +58,3 @@ bool obscureTextCorrect(bool? obscureText){
 bool autofocusCorrect(bool? autofocus){
   return autofocus == null ? false : autofocus;
 }
-// onSaved: (value) {
-    //       if(value != null) {
-    //         _email = value;
-    //       }
-    //     },
-    //     autofocus: true,
-    //     validator: (value) {
-    //       if(value == null) {
-    //         return 'El Email no puede estar vacio';
-    //       } else if(value.isEmpty) {
-    //         return 'El Email no puede estar vacio';
-    //       } else {
-    //         return null;
-    //       }
-    //     },
