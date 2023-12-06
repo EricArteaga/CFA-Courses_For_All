@@ -299,7 +299,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
         } else if (e.code == "wrong-password") {
           wrongPasswordMessage();
         } else if (e.code == "invalid-email") {
-          invalidMessageMessage();
+          invalidEmailMessage();
         } else if (e.code == "invalid-credential") {
           invalidCredentialMessage();
         }
@@ -914,7 +914,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
     );
   }
 
-  void invalidMessageMessage() {
+  void invalidEmailMessage() {
     showDialog(
         context: context,
         builder: (context) {

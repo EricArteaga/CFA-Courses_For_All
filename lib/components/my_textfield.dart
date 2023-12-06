@@ -33,7 +33,13 @@ class MyTextFormField extends StatelessWidget{
         obscureText: obscureTextCorrect(obscureText),
         autofocus: autofocusCorrect(autofocus),
         enabled: enabled,
+        style: TextStyle(
+          color: enabled != null && enabled! ? Colors.black : Colors.black,
+        ),
         decoration: InputDecoration(
+          labelStyle: TextStyle(
+            color: enabled != null && enabled! ? Colors.black : Colors.black,
+          ),
           enabledBorder: const OutlineInputBorder(
             borderSide: BorderSide(color: Colors.white),
           ),

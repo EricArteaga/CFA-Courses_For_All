@@ -81,7 +81,9 @@ Future<Map<String, dynamic>?> getProfesorById(String teacherID) async {
 // ? CREATE Profesor
 Future<void> createProfesor(Map<String, dynamic> profesor, String? uid) async{
   CollectionReference collectionReferenceProfesor = db.collection('profesor');
-  await collectionReferenceProfesor.doc(uid).set(profesor);
+  await collectionReferenceProfesor
+      .doc(uid)
+      .set(profesor);
 }
 
 //? UPDATE Profesor
@@ -98,23 +100,30 @@ Future<void> deleteProfesor(String id) async{
 
 // End CRUD de la colección Profesor
 // Region CRUD de la colección Curso
-// ? GET Curso
-Future<List> getCursos() async{
-  List cursos = [];
+// ? GET Cursos
+Future<List<Map<String, dynamic>>> getCursos({String? teacherID}) async{
+  List<Map<String, dynamic>> cursos = [];
   CollectionReference collectionReferenceCursos = db.collection('curso');
 
   // get() devuelve un QuerySnapshot con el que se trata gracias a la sintasis
   // de then, recogiendo ese valor y creando una función donde se recorre los
   // resultados del get() con un forEach()
-  await collectionReferenceCursos.get().then((value) {
-    value.docs.forEach((element) {
-      cursos.add(element.data());
-    });
-  });
+  QuerySnapshot querySnapshot;
+  if (teacherID != null) {
+    querySnapshot = await collectionReferenceCursos.where('profesor_id', isEqualTo: teacherID).get();
+  } else {
+    querySnapshot = await collectionReferenceCursos.get();
+  }
+
+  cursos = querySnapshot.docs.map((element) {
+    return {
+      "id": element.id,
+      "data": element.data(),
+    };
+  }).toList();
 
   // Retardamos la petición para que aparezca el circulo de carga
-  await Future.delayed(const Duration(seconds: 1, milliseconds: 5));
-
+  await Future.delayed(const Duration(seconds: 1));
 
   return cursos;
 }
@@ -128,12 +137,16 @@ Future<void> createCurso(Map<String, dynamic> curso) async{
 //? UPDATE Curso
 Future<void> updateCurso(String id, Map<String, dynamic> curso) async{
   CollectionReference collectionReferenceCurso = db.collection('curso');
-  collectionReferenceCurso.doc(id).update(curso);
+  collectionReferenceCurso
+      .doc(id)
+      .update(curso);
 }
 
 //? DELETE Curso
 Future<void> deleteCurso(String id) async{
   CollectionReference collectionReferenceCurso = db.collection('curso');
-  await collectionReferenceCurso.doc(id).delete();
+  await collectionReferenceCurso
+      .doc(id)
+      .delete();
 }
 // End CRUD de la colección Curso

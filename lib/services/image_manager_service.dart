@@ -5,13 +5,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 final FirebaseStorage storage = FirebaseStorage.instance;
 
-// Meétodo que te escoge una foto de la galería
+// Método que te escoge una foto de la galería
 Future<XFile?> getImage() async{
   final ImagePicker picker = ImagePicker();
   final XFile? image = await picker.pickImage(source: ImageSource.gallery);
   return image;
 }
 
+// Método con te sube la imagen a Firebase storage y te devuelve su URL
 Future<String?> uploadImage( File? image) async{
 
   if(image != null){

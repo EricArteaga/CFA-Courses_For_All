@@ -39,13 +39,14 @@ dependencies:
   # Otras dependencias
   flutter_slidable: 3.0.1
   image_picker: ^1.0.4
+  cached_network_image: ^3.3.0
 
   # Dependencias de FireBase
   firebase_core: ^2.23.0
   cloud_firestore: ^4.13.2
   firebase_auth: ^4.14.1
   firebase_storage: ^11.5.3
-  cached_network_image: ^3.3.0
+
 
 
 dev_dependencies:

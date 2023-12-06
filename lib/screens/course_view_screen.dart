@@ -11,17 +11,26 @@ import '../services/image_manager_service.dart';
 
 class CourseViewScreen extends StatefulWidget {
   // Atributo final que denota si se está editando o viendo el curso
-  // Valores: "Edit" - "View" - "Create"
+  // Note - Valores: "Edit" - "View" - "Create"
   final String screenState;
 
   // Atributo final que es el objeto Map<String, dynamic> del curso
-  // Note - Solo para editar y mirar
-  final Map<String, dynamic>? curso;
+  // Note - Solo para "Edit" y "View"
+  final Map<String, dynamic>? course;
+
+  // ID del curso para poder editarlo
+  // Note - Solo para "Edit"
+  final String? courseID;
+
+  // ID del profesor
+  final String? teacherID;
 
   const CourseViewScreen({
     super.key,
     required this.screenState,
-    this.curso
+    this.course,
+    this.courseID,
+    this.teacherID
   });
 
   @override
@@ -34,8 +43,14 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
   // Get del ScreenState
   String get screenState => widget.screenState;
 
+  // Get del id del curso
+  String? get courseID => widget.courseID;
+
   // Get del curso
-  Map<String, dynamic>? get curso => widget.curso;
+  Map<String, dynamic>? get curso => widget.course;
+
+  // Get del ID del profesor
+  String? get teacherID => widget.teacherID;
 
   // Estado del formulario
   final formKeyCreateCourse = GlobalKey<FormState>();
@@ -45,13 +60,39 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
   final _durationCourseController = TextEditingController();
   final _teacherIDCourseController = TextEditingController();
   final _languageCourseController = TextEditingController();
-  File? _selectedImageController;
+  File? _selectedImageFile;
+
+
+  @override
+  initState(){
+    super.initState();
+
+    // Se cargan los datos de los campos según el método checkDownloadCourse()
+    if(checkDownloadCourse()){
+      downloadCourseValues();
+    }
+
+    String profesorID = teacherID ?? curso?["profesor_id"] ?? "";
+    _teacherIDCourseController.text = profesorID;
+  }
  // Note - ¿Se añade PDF?
 
-  // TODO: Desabilitar campos cuando se entre para ver los datos del curso
+  // TODO: Implementar lógica para cargar datos del curso
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: Colors.grey[300],
+      // TODO: Hacer método appBar()
+      appBar: AppBar(
+        centerTitle: true,
+        title:  Text(
+          setAppBarTitle(),
+          style: const TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           //padding: EdgeInsets.symmetric(vertical: size.width * 0.1, horizontal: size.width * 0.1),
@@ -61,28 +102,13 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
 
-                      const SizedBox(height: 20,),
-
-                      // TODO: Hacer que los campos del form estén desabilitados si se está viendo el curso
-                      // Texto crear curso
-                      const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 25.0),
-                        child: Text(
-                          "Crear Curso",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 40,),
 
                       // Campo del titulo
                       MyTextFormField(
                         controller: _titleCourseController,
                         labelText: "Título",
-                        enabled: comprobateScreenState(),
+                        enabled: checkEnabledFields(),
                         onSaved: (value) {
                           if (value != null) {
                             _titleCourseController.text = value;
@@ -101,11 +127,34 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
 
                       const SizedBox(height: 10,),
 
+                      // Campo del idioma
+                      MyTextFormField(
+                        controller: _languageCourseController,
+                        labelText: "Idioma",
+                        enabled: checkEnabledFields(),
+                        onSaved: (value) {
+                          if (value != null) {
+                            _languageCourseController.text = value;
+                          }
+                        },
+                        validator: (value) {
+                          if (value == null) {
+                            return 'El idioma no puede estar vacia';
+                          } else if (value.isEmpty) {
+                            return 'El idioma no puede estar vacio';
+                          } else {
+                            return null;
+                          }
+                        },
+                      ),
+
+                      const SizedBox(height: 10,),
+
                       // Campo de la duración
                       MyTextFormField(
                         controller: _durationCourseController,
                         labelText: "Duración",
-                        enabled: comprobateScreenState(),
+                        enabled: checkEnabledFields(),
                         onSaved: (value) {
                           if (value != null) {
                             _durationCourseController.text = value;
@@ -129,7 +178,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                       MyTextFormField(
                         controller: _teacherIDCourseController,
                         labelText: "ID Profesor",
-                        enabled: true,
+                        enabled: false,
                         onSaved: (value) {
                           if (value != null) {
                             _teacherIDCourseController.text = value;
@@ -148,31 +197,12 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
 
                       const SizedBox(height: 10,),
 
-                      // Campo del idioma
-                      MyTextFormField(
-                        controller: _languageCourseController,
-                        labelText: "Idioma",
-                        enabled: comprobateScreenState(),
-                        onSaved: (value) {
-                          if (value != null) {
-                            _languageCourseController.text = value;
-                          }
-                        },
-                        validator: (value) {
-                          if (value == null) {
-                            return 'El idioma no puede estar vacia';
-                          } else if (value.isEmpty) {
-                            return 'El idioma no puede estar vacio';
-                          } else {
-                            return null;
-                          }
-                        },
-                      ),
-
-                      // TODO: Implementar subida de imagen
                       MyImageField(
+                        enabled: checkEnabledFields(),
+                        exitsCourse: checkDownloadCourse(),
+                        courseImage: widget.course?["imagenURL"],
                         getSelectedImage: (File? selectedImage) {
-                          _selectedImageController = selectedImage;
+                          _selectedImageFile = selectedImage;
                         },
                       ),
 
@@ -191,21 +221,42 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
     );
   }
 
+  // Note - Me he dado cuenta de que existen dos tipos de comprobaciones
+  // Note - 1. La que permite que los campos estén enabled -> "Create" or "Edit"
+  // Note - 2. La que te carga los datos del curso -> "Edit" or "View"
   // Método que te comprueba el screenState y te permite modificar el campo o no
-  bool comprobateScreenState(){
+  bool checkEnabledFields(){
     // True para "Edit" y "Create", y false para "View"
     return screenState == "Edit" || screenState == "Create" ? true : false;
   }
 
+  // Método que te comprueba el screenState y te carga los datos del curso
+  bool checkDownloadCourse(){
+    // True para "Edit" y "View", y false para "Create"
+    return screenState == "Edit" || screenState == "View" ? true : false;
+  }
+
+  // Método que te devuelve un texto para el AppBar según el screenState
+   setAppBarTitle(){
+    String title = "";
+    if(screenState == "View"){
+      title = "Datos del curso";
+    }else if(screenState == "Edit"){
+      title = "Editar Curso";
+    }else if(screenState == "Create"){
+      title = "Crear Curso";
+    }
+    return title;
+  }
+
   Widget showBottom(){
-    if(comprobateScreenState()){
+    if(checkEnabledFields()){
       // Te muestra el botón según el screenState
       return MyButton(
-        text: screenState == "Create "? "Crear curso" : "Modificar curso",
-        onTap: screenState == "Create "? crearCurso : modificarCurso,
+        text: screenState == "Create" ? "Crear curso" : "Modificar curso",
+        onTap: screenState == "Create" ? crearCurso : modificarCurso,
       );
     }else{
-
       // No te muestra nada
       return const SizedBox(height: 0,);
     }
@@ -239,34 +290,95 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
         }
       );
 
-      // TODO: Añadir las comprobaciones necesarias y los mensajes de error
+      try {
+        /*
+         * Se sube la imagen al storage y se obtiene la url de donde está, para
+         * pasarlo como parametro al curso.
+         */
+        String? imageURL = await uploadImage(_selectedImageFile);
 
+        // Creamos un mapa que guarda los campos
+        Map<String, dynamic> createdCourse = <String, dynamic>{
+          "titulo": _titleCourseController.text.trim(),
+          "duracion": _durationCourseController.text.trim(),
+          "profesor_id": _teacherIDCourseController.text.trim(),
+          "idioma": _languageCourseController.text.trim(),
+          "imagenURL": imageURL,
+        };
 
-      /*
-       * Se sube la imagen al storage y se obtiene la url de done está, para
-       * pasarlo como parametro al curso.
-       */
-      Future<String?> imageURL = uploadImage(_selectedImageController);
-
-      // Creamos un mapa que guarda los campos
-      Map<String, dynamic> curso = <String, dynamic>{
-        "titulo": _titleCourseController.text.trim(),
-        "duracion": _durationCourseController.text.trim(),
-        "profesor_id": _teacherIDCourseController.text.trim(),
-        "idioma": _languageCourseController.text.trim(),
-        "imagenURL": imageURL,
-      };
-
-      /*
-       * Se crea en la colección curso un curso con sus datos del fomulario,
-       * y con el id del profesor para saber que profesor es el que ha creado
-       * el curso
-       */
-      //await createCurso(curso);
+        /*
+         * Se crea en la colección curso un curso con sus datos del fomulario,
+         * y con el id del profesor para saber que profesor es el que ha creado
+         * el curso
+         */
+        await createCurso(createdCourse);
+      } catch (e) {
+        print("Error: ${e.toString()}");
+      }
     }
   }
 
   Future modificarCurso() async{
+    if(validateAndSaveCourse()){
+      // Se muestra el circulo de carga
+      showDialog(
+          context: context,
+          builder: (context) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+      );
 
+      try {
+        /*
+         * Se sube la imagen al storage y se obtiene la url de donde está, para
+         * pasarlo como parametro al curso.
+         */
+        String? imageURL;
+        if(_selectedImageFile != null){
+          imageURL = await uploadImage(_selectedImageFile);
+        } else{
+          imageURL = curso?["imagenURL"] ?? "";
+        }
+
+
+        // Creamos un mapa que guarda los campos
+        Map<String, dynamic> editedCourse = <String, dynamic>{
+          "titulo": _titleCourseController.text.trim(),
+          "duracion": _durationCourseController.text.trim(),
+          "profesor_id": _teacherIDCourseController.text.trim(),
+          "idioma": _languageCourseController.text.trim(),
+          "imagenURL": imageURL,
+        };
+
+        /*
+         * Se crea en la colección curso un curso con sus datos del fomulario,
+         * y con el id del profesor para saber que profesor es el que ha creado
+         * el curso
+         */
+        await updateCurso(courseID!, editedCourse);
+        Navigator.pop(context);
+
+      } catch (e) {
+        print("Error: ${e.toString()}");
+      }
+    }
   }
+
+  // Método que te carga los datos del curso
+  Future downloadCourseValues() async{
+    if (curso != null) {
+      // Obtener datos del mapa del curso
+      String titulo = curso?["titulo"] ?? "";
+      String duracion = curso?["duracion"] ?? "";
+      String idioma = curso?["idioma"] ?? "";
+
+      // Asignar valores a los controladores
+      _titleCourseController.text = titulo;
+      _durationCourseController.text = duracion;
+      _languageCourseController.text = idioma;
+    }
+  }
+
 }

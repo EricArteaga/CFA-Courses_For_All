@@ -1,4 +1,5 @@
 import 'package:cfa_coursesforall/components/my_course_tile.dart';
+import 'package:cfa_coursesforall/screens/course_view_screen.dart';
 import 'package:cfa_coursesforall/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +16,12 @@ class _SignedInState extends State<SignedIn> {
 
   //Datos del usuario
   String _email = "";
+  String? _id;
 
   //String _foto = "";
   void obetenerDatosDelUsuario(){
     _email = user.email!;
+    _id = user.uid;
     //_nombre = user.displayName!;
     //_foto = user.photoURL!;
   }
@@ -26,11 +29,12 @@ class _SignedInState extends State<SignedIn> {
   @override
   initState(){
     super.initState();
+
+    obetenerDatosDelUsuario();
   }
 
   @override
   Widget build(BuildContext context) {
-    obetenerDatosDelUsuario();
 
     // Declaración del Scaffold
     return teacherScaffold();
@@ -51,7 +55,7 @@ class _SignedInState extends State<SignedIn> {
     );
   }
 
-  // TODO: Hacer que este scaffold solo te muestre tus cursos creados
+  // TODO: Hacer que este scaffold solo te muestre tus cursos creados (profesor)
   // Método que te devuelve un scaffold con todos los cursos creados
   Scaffold teacherScaffold(){
     return Scaffold(
@@ -67,14 +71,39 @@ class _SignedInState extends State<SignedIn> {
               return ListView.builder(
                 itemCount: snapshot.data?.length,
                 itemBuilder: (context, index) {
+
+                  // Variable que almacena el id del curso
+                  final String id = snapshot.data![index]['id'];
+
+                  // Variable final curso de tipo "dynamic", que en verdad siempre será
+                  // un Map<String, dynamic>?
+                  final Map<String, dynamic> course = snapshot.data![index]['data'];
+
+                  // Componente con la información del curso
                   return MyCourseTile(
-                    title: snapshot.data?[index]["titulo"],
-                    duration: snapshot.data?[index]["duracion"],
-                    teacherID: snapshot.data?[index]["profesor_id"],
-                    language: snapshot.data?[index]["idioma"],
-                    imageURL: snapshot.data?[index]["imagenURL"],
-                    // TODO: Se debe implementar un método que te abra la ventana para ver ese curso en especifico
-                    onTap: (){
+                    course: course,
+                    onTap: () async{
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CourseViewScreen(
+                              screenState: "View",
+                              course: course,
+                          )));
+
+                      // Se actualizan los datos cuando se vuelve a la página
+                      _reloadData();
+                    },
+                    editTapped: (context) async{
+                      await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => CourseViewScreen(
+                            screenState: "Edit",
+                            course: course,
+                            courseID: id,
+                          )));
+
+                      // Se actualizan los datos cuando se vuelve a la página
+                      _reloadData();
                     },
                   );
                 }
@@ -96,12 +125,39 @@ class _SignedInState extends State<SignedIn> {
     return FloatingActionButton(
       shape: const CircleBorder(),
       backgroundColor: Colors.green[500],
-      child: const Icon(Icons.add, size: 40,),
       elevation: 30.0,
-      // Método que te abre la ventana de crear cursos
-      onPressed: (){
 
+      // Método que te abre la ventana de crear cursos
+      onPressed: () async{
+        await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) =>  CourseViewScreen(
+              screenState: "Create",
+              teacherID: _id,
+            )));
+
+        // Se actualizan los datos cuando se vuelve a la página
+        _reloadData();
       },
+
+      child: const Icon(Icons.add, size: 40,),
     );
+  }
+
+  // Método para recargar los datos
+  void _reloadData() async {
+    // Se muestra el circulo de carga
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+    );
+
+    setState(() {});
+
+    Navigator.pop(context);
   }
 }
