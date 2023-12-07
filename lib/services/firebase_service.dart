@@ -165,11 +165,11 @@ Future<void> deleteCurso(String id) async{
 // Region Complementos
 // Método que me devuelve el tipo de usuario del id introducido
 Future<String> getUserType(String userID) async{
-  // Consulta para verificar si el usuario está en la colección de profesores
-  bool isProfessor = await isUserInCollection(userID, "profesores");
+  // Consulta para verificar si el usuario está en la colección de profesor
+  bool isProfessor = await isUserInCollection(userID, "profesor");
 
-  // Consulta para verificar si el usuario está en la colección de alumnos
-  bool isStudent = await isUserInCollection(userID, "alumnos");
+  // Consulta para verificar si el usuario está en la colección de alumno
+  bool isStudent = await isUserInCollection(userID, "alumno");
 
   if (isProfessor) {
     return "profesor";

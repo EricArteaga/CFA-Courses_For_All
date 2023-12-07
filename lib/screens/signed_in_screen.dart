@@ -4,6 +4,9 @@ import 'package:cfa_coursesforall/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../components/my_wrong_message.dart';
+import '../tools/dialog_messages.dart';
+
 class SignedIn extends StatefulWidget{
   const SignedIn({super.key});
 
@@ -18,7 +21,7 @@ class _SignedInState extends State<SignedIn> {
   String _email = "";
   String? _id;
 
-  late final String userType;
+  late String userType = "desconocido";
 
   //String _foto = "";
   void obetenerDatosDelUsuario() async{
@@ -30,14 +33,8 @@ class _SignedInState extends State<SignedIn> {
     // Determinar el tipo de usuario
     userType = await getUserType(_id!);
 
-    // Resto del código según el tipo de usuario
-    if (userType == "profesor") {
-      // Código para profesor
-    } else if (userType == "alumno") {
-      // Código para alumno
-    } else {
-      // Código para otro tipo o desconocido
-    }
+    // Recarga del State para poner el scaffold correspondiente
+    setState(() {});
   }
 
   @override
@@ -90,7 +87,7 @@ class _SignedInState extends State<SignedIn> {
                 itemBuilder: (context, index) {
 
                   // Variable que almacena el id del curso
-                  final String id = snapshot.data![index]['id'];
+                  final String courseID = snapshot.data![index]['id'];
 
                   // Variable final curso
                   final Map<String, dynamic> course = snapshot.data![index]['data'];
@@ -118,7 +115,7 @@ class _SignedInState extends State<SignedIn> {
                                     )));
 
                             // Se actualizan los datos cuando se vuelve a la página
-                            _reloadData();
+                            reloadData();
                           },
                           editTapped: (context) async {
                             await Navigator.push(
@@ -127,14 +124,17 @@ class _SignedInState extends State<SignedIn> {
                                     CourseViewScreen(
                                       screenState: "Edit",
                                       course: course,
-                                      courseID: id,
+                                      courseID: courseID,
 
                                       // El snapshot trae nombre del profesor
                                       teacherName: snapshot.data!,
                                     )));
 
                             // Se actualizan los datos cuando se vuelve a la página
-                            _reloadData();
+                            reloadData();
+                          },
+                          deleteTapped: (context) async {
+                            deleteCourse( courseID);
                           },
                         );
                       }else{
@@ -156,6 +156,22 @@ class _SignedInState extends State<SignedIn> {
         ),
       )
     );
+  }
+
+  // Método para eliminar el curso
+  void deleteCourse(String courseID) async{
+    bool confirmedDelete = await confirmDeleteCourseMessage(context);
+
+    if(confirmedDelete){
+      try {
+        await deleteCurso(courseID);
+        reloadData();
+      } catch (e){
+        unknownErrorMessage();
+      };
+    }
+
+
   }
 
   // Método que devuelve un floatingActionButton para crear cursos
@@ -183,7 +199,7 @@ class _SignedInState extends State<SignedIn> {
             )));
 
           // Se actualizan los datos cuando se vuelve a la página
-            _reloadData();
+            reloadData();
           },
 
           child: const Icon(Icons.add, size: 40,),
@@ -216,10 +232,6 @@ class _SignedInState extends State<SignedIn> {
                   itemCount: snapshot.data?.length,
                   itemBuilder: (context, index) {
 
-                    // Variable que almacena el id del curso
-                    // Note - Esto es para editar, quizás se puede eliminar
-                    final String id = snapshot.data![index]['id'];
-
                     // Variable final curso
                     // Note - Esto es para cargar los campos en la vista, NO se elimina
                     final Map<String, dynamic> course = snapshot.data![index]['data'];
@@ -250,7 +262,7 @@ class _SignedInState extends State<SignedIn> {
                                         )));
 
                                 // Se actualizan los datos cuando se vuelve a la página
-                                _reloadData();
+                                reloadData();
                               },
                               editTapped: (context) async {
                                 await Navigator.push(
@@ -259,14 +271,12 @@ class _SignedInState extends State<SignedIn> {
                                         CourseViewScreen(
                                           screenState: "Edit",
                                           course: course,
-                                          courseID: id,
-
                                           // El snapshot trae nombre del profesor
                                           teacherName: snapshot.data!,
                                         )));
 
                                 // Se actualizan los datos cuando se vuelve a la página
-                                _reloadData();
+                                reloadData();
                               },
                             );
                           }else{
@@ -315,7 +325,7 @@ class _SignedInState extends State<SignedIn> {
   }
   
   // Método para recargar los datos
-  void _reloadData() async {
+  void reloadData() async {
     // Se muestra el circulo de carga
     showDialog(
         context: context,
@@ -329,6 +339,20 @@ class _SignedInState extends State<SignedIn> {
     setState(() {});
 
     Navigator.pop(context);
+  }
+
+  // Mensaje de campos obligatorios
+  void unknownErrorMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Error desconocido",
+              content: "No se ha podido realizar la operación por un error "
+                  "desconocido"
+          );
+        }
+    );
   }
 
 // End Funcionalidades Comunes

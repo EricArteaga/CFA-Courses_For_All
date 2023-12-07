@@ -7,8 +7,6 @@ import '../services/firebase_service.dart';
 import 'my_list_tile.dart';
 
 class MyCourseTile extends StatelessWidget{
-  // TODO: Implementar subida de imagen del Curso
-  // TODO: Refactorizar atributos por el curso entero
   final Map<String, dynamic>? course;
 
   // Método que recoje el curso para pasarselo al padre
@@ -35,11 +33,10 @@ class MyCourseTile extends StatelessWidget{
       padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
       child: Slidable(
         endActionPane: ActionPane(
-            motion: StretchMotion(),
+            motion: const StretchMotion(),
             children: [
 
               // Opción de editar
-              // TODO: Implementar método para abrir CourseScreenView en edición
               SlidableAction(
                 onPressed: editTapped,
                 backgroundColor: Colors.grey.shade800,
@@ -94,19 +91,4 @@ class MyCourseTile extends StatelessWidget{
       ),
     );
   }
-
-  // Método para eliminar el curso
-  void deleteCourse(BuildContext context){
-
-  }
-
-  // Métodopara abrir la venta de edición del curso
-  void editCourse(BuildContext context){
-    MaterialPageRoute(builder: (context) => CourseViewScreen(
-      screenState: "Edit",
-      course: course,
-      teacherName: "",
-    ));
-  }
-
 }

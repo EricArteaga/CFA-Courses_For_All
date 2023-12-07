@@ -22,6 +22,7 @@ class MyListTile extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return ListTile(
+      tileColor: Colors.grey.shade200,
       leading: image, // Imagen del curso
       title: Text(title,),
       subtitle: Row(
