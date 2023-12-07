@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../components/my_button.dart';
 import '../components/my_image_field.dart';
 import '../components/my_textfield.dart';
+import '../components/my_wrong_message.dart';
 import '../services/image_manager_service.dart';
 
 class UserViewScreen extends StatefulWidget {
@@ -293,50 +294,137 @@ class _UserViewScreenState extends State<UserViewScreen> {
           }
       );
 
-      try {
-        /*
+      // Se comprueban las contraseñas
+      if ((_userPasswordController.text == "") ||
+          (_confirmUserPasswordController.text == "") ||
+          (_userPasswordController.text != _confirmUserPasswordController.text)) {
+        Navigator.pop(context);
+        dontMatchPasswordsMessage();
+
+      // Se comprueba que la contraseña no sea debil
+      } else if(_userPasswordController.text.length > 6){
+        Navigator.pop(context);
+        weakPasswordMessage();
+
+        // Se comprueba el email
+      } else if (!validateEmail(_userEmailController.text.trim())) {
+        Navigator.pop(context);
+        wrongEmailMessage();
+      } else {
+        try {
+          /*
          * Se sube la imagen al storage y se obtiene la url de donde está, para
          * pasarlo como parametro al curso.
          */
-        String? imageURL;
-        // Se comprueba si se ha seleccionado una imagen y se guarda
-        if(_selectedImageFile != null){
-          imageURL = await uploadImage(_selectedImageFile);
+          String? imageURL;
+          // Se comprueba si se ha seleccionado una imagen y se guarda
+          if (_selectedImageFile != null) {
+            imageURL = await uploadImage(_selectedImageFile);
 
-          // Si no, se guarda la que ya estaba
-        } else{
-          imageURL = _userImageURL;
-        }
+            // Si no, se guarda la que ya estaba
+          } else {
+            imageURL = _userImageURL;
+          }
 
-        // Creamos un mapa que guarda los campos
-        Map<String, dynamic> editedUser = <String, dynamic>{
-          "name": _userNameController.text.trim(),
-          "surnames": _userSurnamesController.text.trim(),
-          "password": _userPasswordController.text.trim(),
-          "imageURL": imageURL,
-        };
+          // Creamos un mapa que guarda los campos
+          Map<String, dynamic> editedUser = <String, dynamic>{
+            "name": _userNameController.text.trim(),
+            "surnames": _userSurnamesController.text.trim(),
+            "password": _userPasswordController.text.trim(),
+            "imageURL": imageURL,
+          };
 
-        /*
+          /*
          * Se actualiza en la colección del tipo de usuario un usuario con sus datos
          * del fomulario
          */
-        if(widget.userType == "profesor"){
-          Navigator.pop(context);
-          await updateProfesor(user.uid, editedUser);
+          if (widget.userType == "profesor") {
+            Navigator.pop(context);
+            await updateProfesor(user.uid, editedUser);
 
-        // widget.userType == "alumno"
-        }else{
-          Navigator.pop(context);
-          await updateAlumno(user.uid, editedUser);
+            // widget.userType == "alumno"
+          } else {
+            Navigator.pop(context);
+            await updateAlumno(user.uid, editedUser);
+          }
+          String uid = FirebaseAuth.instance.currentUser!.uid;
 
+          // Actualizar el correo electrónico del usuario en Authentication
+          await FirebaseAuth.instance.currentUser!.updateEmail(_userEmailController.text.trim());
+
+          // Actualiza el usuario en Authentication
+          await FirebaseAuth.instance.currentUser!.updatePassword(_userPasswordController.text.trim());
+
+        } on FirebaseAuthException catch (e) {
+
+          if (e.code == 'weak-password') {
+            weakPasswordMessage();
+          } else if(e.code == 'invalid-email'){
+            invalidEmailMessage();
+          }
         }
-
-
-
-      } catch (e) {
-        print("Error: ${e.toString()}");
       }
     }
+  }
+
+  // Método para comprobar si el email es correto
+  bool validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = RegExp(pattern as String);
+    return regex.hasMatch(value);
+  }
+
+  // Mensaje de las contraseñas no coinciden
+  void dontMatchPasswordsMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Las contraseñas no coinciden",
+              content: "Las contraseñas deben coincidir"
+          );
+        }
+    );
+  }
+
+  // Mensaje de email incorrecto
+  void wrongEmailMessage() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Email incorrecto",
+              content: "Por favor, introduce un email que pertenezca a una cuenta"
+          );
+        }
+    );
+  }
+
+  // Mensaje de campos obligatorios
+  void weakPasswordMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Contraseña debil",
+              content: "La contraseña es demasiado debil"
+          );
+        }
+    );
+  }
+
+  // Email invalido
+  void invalidEmailMessage() {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Email invalido",
+              content: "El email es invalido, asegurate que lo has escrito bien"
+          );
+        }
+    );
   }
 
 }

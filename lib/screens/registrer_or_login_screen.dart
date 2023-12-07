@@ -953,7 +953,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
     );
   }
 
-  // Mensaje de campos obligatorios
+  // Mensaje de email ya registrado
   void alreadyExistsUserMessage(){
     showDialog(
         context: context,
@@ -966,7 +966,7 @@ class _RegistrerOrLoginScreenState extends State<RegistrerOrLoginScreen> {
     );
   }
 
-  // Mensaje de campos obligatorios
+  // Mensaje de contraseña debil
   void weakPasswordMessage(){
     showDialog(
         context: context,
