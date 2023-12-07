@@ -31,12 +31,10 @@ class MyCourseTile extends StatelessWidget{
     this.deleteTapped
   });
 
-
-  // TODO: Implementar que Slidable solo esté para el profesor
   @override
   Widget build(BuildContext context){
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
+      padding: const EdgeInsets.only(left: 10.0,right: 10, top: 20),
       child: userType == "profesor" ? courseTileForTeacher()
             :
         courseTileForStudent(),
@@ -79,14 +77,7 @@ class MyCourseTile extends StatelessWidget{
               image: CircleAvatar(
                 radius: 30.0,
                 backgroundColor: Colors.grey[500],
-                //backgroundImage: const AssetImage('lib/images/Logo_CFA.png'),
-                child: ClipOval(
-                  child: SizedBox(
-                      height: 200,
-                      width: 200,
-                      child: MyImageWidget(imageUrl: course?["imagenURL"] ?? "")
-                  ),
-                ),
+                backgroundImage: NetworkImage( course?["imagenURL"] ?? ""),
               ),
 
               title: course?["titulo"] ?? "",
@@ -117,14 +108,7 @@ class MyCourseTile extends StatelessWidget{
             image: CircleAvatar(
               radius: 30.0,
               backgroundColor: Colors.grey[500],
-              //backgroundImage: const AssetImage('lib/images/Logo_CFA.png'),
-              child: ClipOval(
-                child: SizedBox(
-                    height: 200,
-                    width: 200,
-                    child: MyImageWidget(imageUrl: course?["imagenURL"] ?? "")
-                ),
-              ),
+              backgroundImage: NetworkImage( course?["imagenURL"] ?? ""),
             ),
 
             title: course?["titulo"] ?? "",

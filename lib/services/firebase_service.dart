@@ -19,6 +19,30 @@ Future<List> getAlumnos() async{
   });
   return alumnos;
 }
+// ? GET Alumno By ID
+Future<Map<String, dynamic>?> getAlumnoById(String? studentID) async {
+  CollectionReference collectionReferenceAlumno = db.collection('alumno');
+
+
+  DocumentSnapshot alumnoSnapshot;
+  if (studentID != null) {
+    alumnoSnapshot = await collectionReferenceAlumno
+        .doc(studentID)
+        .get();
+  } else {
+    alumnoSnapshot = await collectionReferenceAlumno
+        .doc("falloAPosta") // Hacemos que falle para que devuelva null
+        .get();
+  }
+
+  if (alumnoSnapshot.exists) {
+    // El alumno existe, devuelve sus datos como un mapa
+    return alumnoSnapshot.data() as Map<String, dynamic>;
+  } else {
+    // El alumno no existe
+    return null;
+  }
+}
 
 // ? CREATE Alumno
 Future<void> createAlumno(Map<String, dynamic> alumno, String? uid) async{

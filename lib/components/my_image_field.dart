@@ -15,7 +15,7 @@ class MyImageField extends StatefulWidget{
   final bool? exitsCourse;
 
   // String que almacena la URL de la imagen si hay un curso
-  final String? courseImage;
+  final String? image;
 
   // Callback de la imagen que seleccionas
   final Function(File?)? getSelectedImage;
@@ -25,7 +25,7 @@ class MyImageField extends StatefulWidget{
     this.enabled,
     this.exitsCourse,
     this.getSelectedImage,
-    this.courseImage,
+    this.image,
   });
 
   @override
@@ -37,7 +37,6 @@ class _MyImageFieldState extends State<MyImageField> {
   // Imagen seleccionada
   File? selectedImage;
 
-
   @override
   Widget build(BuildContext context){
 
@@ -48,12 +47,12 @@ class _MyImageFieldState extends State<MyImageField> {
       child: Column(
         children: [
 
-          // TODO: Implementar que se vea la imagen de un curso ("View" o "Edit")
           // Imagen a mostrar
           CircleAvatar(
             radius: 100.0,
             backgroundColor: Colors.grey[700],
-            child:  putImage(),
+            backgroundImage: selectedImage == null ? putLocalImage() : null,
+            child:  selectedImage != null ? putSelectedImage() : null,
           ),
 
           const SizedBox(height: 10,),
@@ -101,28 +100,23 @@ class _MyImageFieldState extends State<MyImageField> {
     );
   }
 
-  Widget? putImage(){
+  ImageProvider<Object>? putLocalImage(){
     if(selectedImage != null) {
-      return ClipOval(
-          child: SizedBox(
-              height: 200,
-              width: 200,
-              child: Image.file(selectedImage!)));
-    }else if(widget.courseImage != null) {
-      return ClipOval(
-          child: SizedBox(
-              height: 200,
-              width: 200,
-              child: MyImageWidget(imageUrl: widget.courseImage!)));
-    }else{
-      return const Text(
-          "imagen",
-          style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-          )
-      );
+      return NetworkImage( selectedImage!.path ?? "");
+    }else if(widget.image != null) {
+      return NetworkImage( widget.image! ?? "");
     }
+  }
+
+  Widget? putSelectedImage(){
+    return ClipOval(
+        child: SizedBox(
+        width: 200.0, // Ajusta el tamaño según tus necesidades
+        height: 200.0,
+        child: Image.file(selectedImage!),
+        )
+    );
+
   }
 }
 

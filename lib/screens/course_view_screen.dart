@@ -215,7 +215,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                       MyImageField(
                         enabled: checkEnabledFields(),
                         exitsCourse: checkDownloadCourse(),
-                        courseImage: widget.course?["imagenURL"],
+                        image: widget.course?["imagenURL"],
                         getSelectedImage: (File? selectedImage) {
                           _selectedImageFile = selectedImage;
                         },

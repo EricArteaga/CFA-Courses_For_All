@@ -1,5 +1,6 @@
 import 'package:cfa_coursesforall/components/my_course_tile.dart';
 import 'package:cfa_coursesforall/screens/course_view_screen.dart';
+import 'package:cfa_coursesforall/screens/user_view_screen.dart';
 import 'package:cfa_coursesforall/services/firebase_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -21,26 +22,41 @@ class _SignedInState extends State<SignedIn> {
   String _email = "";
   String? _id;
 
+  // Tipo de usuario que ha iniciado sesión
   late String userType = "desconocido";
 
-  //String _foto = "";
+  // Foto de perfil del usuario
+  late String? userImage = "";
+
   void obetenerDatosDelUsuario() async{
     _email = user.email!;
     _id = user.uid;
-    //_nombre = user.displayName!;
-    //_foto = user.photoURL!;
 
     // Determinar el tipo de usuario
     userType = await getUserType(_id!);
 
+    // Imagen de usuario
+    Map<String, dynamic>? userData ;
+    if(userType == "profesor"){
+      userData = await getProfesorById(user.uid);
+
+    // widget.userType == "alumno"
+    }else{
+      userData = await getAlumnoById(user.uid);
+    }
+
+    userImage = userData?["imageURL"] ?? "";
+
     // Recarga del State para poner el scaffold correspondiente
     setState(() {});
+
   }
 
   @override
   initState(){
     super.initState();
 
+    // Se cargan los datos del usuario
     obetenerDatosDelUsuario();
   }
 
@@ -73,7 +89,8 @@ class _SignedInState extends State<SignedIn> {
   // Método que te devuelve un scaffold con todos los cursos creados
   Future<Scaffold> teacherScaffold() async{
     return Scaffold(
-      appBar: appBar(),
+      appBar: headerBarSingIn(),
+      drawer: userDrawer(),
       backgroundColor: Colors.grey[300],
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: await createFloatingActionButton(),
@@ -222,7 +239,8 @@ class _SignedInState extends State<SignedIn> {
   // Region Alumno
   Future<Scaffold> studentScaffold() async{
     return Scaffold(
-      appBar: appBar(),
+      appBar: headerBarSingIn(),
+      drawer: userDrawer(),
       backgroundColor: Colors.grey[300],
       body: SafeArea(
         child: FutureBuilder(
@@ -307,13 +325,71 @@ class _SignedInState extends State<SignedIn> {
     FirebaseAuth.instance.signOut();
   }
 
-  // Barra de la app
-  AppBar appBar(){
+  // Center(child: Text("Logged in as: $_email")),
+
+  // Barra del encabezado en la que tienes las opciones de usuario
+  AppBar headerBarSingIn(){
     return AppBar(
-      title: Center(child: Text("Logged in as: $_email")),
+      title: CircleAvatar(
+        radius: 26.0,
+        backgroundColor: Colors.grey[500],
+        backgroundImage: const AssetImage('lib/images/Logo_CFA.png'),
+      ),
+      centerTitle: true,
+      backgroundColor: Colors.grey[300],
       actions: [
         IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout)),
       ],
+    );
+  }
+
+  // Drawer con los datos de tu perfil
+  Drawer userDrawer(){
+    return Drawer(
+      backgroundColor: Colors.grey[300],
+      child: ListView(
+        children: [
+          DrawerHeader(
+            decoration: const BoxDecoration(
+              color: Colors.grey,
+            ),
+            child: Column(
+              children: [
+
+                CircleAvatar(
+                  radius: 50.0,
+                  backgroundImage: NetworkImage(userImage ?? ''),
+                ),
+
+                const SizedBox(height: 5.0),
+
+                Text(
+                  user.email ?? '',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16.0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(),
+          ListTile(
+            title: Text('Gestionar cuenta'),
+            onTap: () async{
+              await Navigator.of(context).push(
+                MaterialPageRoute(
+                    builder: (context) => UserViewScreen(
+                      userType: userType,
+                    )));
+
+              setState(() {
+                obetenerDatosDelUsuario();
+              });
+            },
+          ),
+        ],
+      ),
     );
   }
 
