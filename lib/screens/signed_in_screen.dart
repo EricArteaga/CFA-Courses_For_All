@@ -102,6 +102,7 @@ class _SignedInState extends State<SignedIn> {
                       if(snapshot.hasData) {
                         return MyCourseTile(
                           course: course,
+                          userType: userType,
                           onTap: () async {
                             await Navigator.push(
                                 context,
@@ -246,9 +247,9 @@ class _SignedInState extends State<SignedIn> {
                         builder: (context, snapshot) {
                           if(snapshot.hasData) {
 
-  // TODO: Hacer que MyCourseTile no tenga Deslizable con los usaurios alumnos
                             return MyCourseTile(
                               course: course,
+                              userType: userType,
                               onTap: () async {
                                 await Navigator.push(
                                     context,
