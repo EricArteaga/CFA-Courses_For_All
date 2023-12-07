@@ -18,14 +18,18 @@ final String content;
   @override
   Widget build(BuildContext context){
       return AlertDialog(
-        title: Text(title),
-        content: Text(content),
+        backgroundColor: Colors.black87,
+        title: Text(title,
+            style: const TextStyle(color:  Colors.white70)),
+        content: Text(content,
+            style: const TextStyle(color:  Colors.white70)),
         actions: <Widget>[
           TextButton(
             onPressed: () {
               Navigator.of(context).pop();
             },
-            child: const Text('OK'),
+            child: const Text('OK',
+            style: TextStyle(color:  Colors.white70)),
           ),
         ],
       );
