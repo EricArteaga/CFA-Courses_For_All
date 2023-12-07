@@ -351,8 +351,11 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
          * pasarlo como parametro al curso.
          */
         String? imageURL;
+        // Se comprueba si se ha seleccionado una imagen y se guarda
         if(_selectedImageFile != null){
           imageURL = await uploadImage(_selectedImageFile);
+
+        // Si no, se guarda la que ya estaba
         } else{
           imageURL = curso?["imagenURL"] ?? "";
         }

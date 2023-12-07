@@ -162,3 +162,37 @@ Future<void> deleteCurso(String id) async{
       .delete();
 }
 // End CRUD de la colección Curso
+// Region Complementos
+// Método que me devuelve el tipo de usuario del id introducido
+Future<String> getUserType(String userID) async{
+  // Consulta para verificar si el usuario está en la colección de profesores
+  bool isProfessor = await isUserInCollection(userID, "profesores");
+
+  // Consulta para verificar si el usuario está en la colección de alumnos
+  bool isStudent = await isUserInCollection(userID, "alumnos");
+
+  if (isProfessor) {
+    return "profesor";
+  } else if (isStudent) {
+    return "alumno";
+  } else {
+    return "desconocido";
+  }
+}
+
+// Método que me comprueba si un usuario está en una colección
+Future<bool> isUserInCollection(String userId, String collectionName) async {
+  // Consulta para verificar si el usuario está en la colección
+  try {
+    DocumentSnapshot userDoc = await FirebaseFirestore.instance
+        .collection(collectionName)
+        .doc(userId)
+        .get();
+
+    return userDoc.exists;
+  } catch (e) {
+    print("Error al verificar la existencia del usuario en la colección: $e");
+    return false;
+  }
+}
+// End

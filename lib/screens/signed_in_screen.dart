@@ -18,12 +18,26 @@ class _SignedInState extends State<SignedIn> {
   String _email = "";
   String? _id;
 
+  late final String userType;
+
   //String _foto = "";
-  void obetenerDatosDelUsuario(){
+  void obetenerDatosDelUsuario() async{
     _email = user.email!;
     _id = user.uid;
     //_nombre = user.displayName!;
     //_foto = user.photoURL!;
+
+    // Determinar el tipo de usuario
+    userType = await getUserType(_id!);
+
+    // Resto del código según el tipo de usuario
+    if (userType == "profesor") {
+      // Código para profesor
+    } else if (userType == "alumno") {
+      // Código para alumno
+    } else {
+      // Código para otro tipo o desconocido
+    }
   }
 
   @override
@@ -36,9 +50,10 @@ class _SignedInState extends State<SignedIn> {
   @override
   Widget build(BuildContext context) {
 
-    // Scaffold del profesor
     return FutureBuilder(
-      future: teacherScaffold(),
+      // En base al tipo se muestra un scaffold u otro
+      future: userType == "profesor" ? teacherScaffold() : studentScaffold(),
+
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
 
@@ -54,23 +69,10 @@ class _SignedInState extends State<SignedIn> {
         }
       },
     );
+
   }
 
-  // Método para quitar el usuario
-  void signUserOut(){
-    FirebaseAuth.instance.signOut();
-  }
-
-  // Barra de la app
-  AppBar appBar(){
-    return AppBar(
-      title: Center(child: Text("Logged in as: $_email")),
-      actions: [
-        IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout)),
-      ],
-    );
-  }
-
+  // Region Profesor
   // Método que te devuelve un scaffold con todos los cursos creados
   Future<Scaffold> teacherScaffold() async{
     return Scaffold(
@@ -199,6 +201,111 @@ class _SignedInState extends State<SignedIn> {
     );
   }
 
+  // End Profesor
+  // Region Alumno
+  Future<Scaffold> studentScaffold() async{
+    return Scaffold(
+      appBar: appBar(),
+      backgroundColor: Colors.grey[300],
+      body: SafeArea(
+        child: FutureBuilder(
+          future: getCursos(),
+          builder: ((context, snapshot){
+            if(snapshot.hasData){
+              return ListView.builder(
+                  itemCount: snapshot.data?.length,
+                  itemBuilder: (context, index) {
+
+                    // Variable que almacena el id del curso
+                    // Note - Esto es para editar, quizás se puede eliminar
+                    final String id = snapshot.data![index]['id'];
+
+                    // Variable final curso
+                    // Note - Esto es para cargar los campos en la vista, NO se elimina
+                    final Map<String, dynamic> course = snapshot.data![index]['data'];
+
+                    // Variable del id del creador (profesor) del curso
+                    // Note - Esto es para obtener el nombre del profesor
+                    final String teacherCreatorID = course['profesor_id'];
+
+                    // Componente con la información del curso
+                    return FutureBuilder(
+                        future: getCreator(teacherCreatorID),
+                        builder: (context, snapshot) {
+                          if(snapshot.hasData) {
+
+  // TODO: Hacer que MyCourseTile no tenga Deslizable con los usaurios alumnos
+                            return MyCourseTile(
+                              course: course,
+                              onTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        CourseViewScreen(
+                                          screenState: "View",
+                                          course: course,
+
+                                          // El snapshot trae el nombre del profesor
+                                          teacherName: snapshot.data!,
+                                        )));
+
+                                // Se actualizan los datos cuando se vuelve a la página
+                                _reloadData();
+                              },
+                              editTapped: (context) async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) =>
+                                        CourseViewScreen(
+                                          screenState: "Edit",
+                                          course: course,
+                                          courseID: id,
+
+                                          // El snapshot trae nombre del profesor
+                                          teacherName: snapshot.data!,
+                                        )));
+
+                                // Se actualizan los datos cuando se vuelve a la página
+                                _reloadData();
+                              },
+                            );
+                          }else{
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+                        }
+                    );
+                  }
+              );
+            }else{
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }
+          ),
+        ),
+      )
+    );
+  }
+  // End Alumno
+  // Region Funcionalidades Comunes
+  // Método para quitar el usuario
+  void signUserOut(){
+    FirebaseAuth.instance.signOut();
+  }
+
+  // Barra de la app
+  AppBar appBar(){
+    return AppBar(
+      title: Center(child: Text("Logged in as: $_email")),
+      actions: [
+        IconButton(onPressed: signUserOut, icon: const Icon(Icons.logout)),
+      ],
+    );
+  }
+
   // Método que obtiene el nombre del profesor creador del curso
   Future<String> getCreator(profesorID) async{
     // Se saca de la base de datos el profesor creador del curso
@@ -223,4 +330,6 @@ class _SignedInState extends State<SignedIn> {
 
     Navigator.pop(context);
   }
+
+// End Funcionalidades Comunes
 }
