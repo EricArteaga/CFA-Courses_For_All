@@ -1,10 +1,10 @@
 import 'dart:io';
 
+import 'package:cfa_coursesforall/components/my_data_course_field.dart';
 import 'package:cfa_coursesforall/components/my_image_field.dart';
 import 'package:flutter/material.dart';
 
 import '../components/my_button.dart';
-import '../components/my_textfield.dart';
 import '../services/firebase_service.dart';
 import '../services/image_manager_service.dart';
 
@@ -25,12 +25,16 @@ class CourseViewScreen extends StatefulWidget {
   // ID del profesor
   final String? teacherID;
 
+  // Nombre del profesor
+  final String teacherName;
+
   const CourseViewScreen({
     super.key,
     required this.screenState,
     this.course,
     this.courseID,
-    this.teacherID
+    this.teacherID,
+    required this.teacherName,
   });
 
   @override
@@ -46,11 +50,16 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
   // Get del id del curso
   String? get courseID => widget.courseID;
 
+  //Get del Nombre del profesor
+  String get teacherName => widget.teacherName;
+
   // Get del curso
   Map<String, dynamic>? get curso => widget.course;
 
-  // Get del ID del profesor
+  // Get del ID del usuario si es un profesor
   String? get teacherID => widget.teacherID;
+
+  late String profesorID;
 
   // Estado del formulario
   final formKeyCreateCourse = GlobalKey<FormState>();
@@ -58,13 +67,12 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
   // Valores del formulario
   final _titleCourseController = TextEditingController();
   final _durationCourseController = TextEditingController();
-  final _teacherIDCourseController = TextEditingController();
+  final _teacherNameController = TextEditingController();
   final _languageCourseController = TextEditingController();
   File? _selectedImageFile;
 
-
   @override
-  initState(){
+  initState() {
     super.initState();
 
     // Se cargan los datos de los campos según el método checkDownloadCourse()
@@ -72,8 +80,14 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
       downloadCourseValues();
     }
 
-    String profesorID = teacherID ?? curso?["profesor_id"] ?? "";
-    _teacherIDCourseController.text = profesorID;
+    // Se obtiene el ID del profesor
+    profesorID = teacherID ?? curso?["profesor_id"] ?? "";
+
+    // Se obtiene el Profesor Creador del curso
+    //getCreator();
+
+    // Se obtiene el nombre del profesor para el campo profesor
+    _teacherNameController.text = teacherName;
   }
  // Note - ¿Se añade PDF?
 
@@ -105,7 +119,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                       const SizedBox(height: 40,),
 
                       // Campo del titulo
-                      MyTextFormField(
+                      MyDataCourseField(
                         controller: _titleCourseController,
                         labelText: "Título",
                         enabled: checkEnabledFields(),
@@ -128,7 +142,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                       const SizedBox(height: 10,),
 
                       // Campo del idioma
-                      MyTextFormField(
+                      MyDataCourseField(
                         controller: _languageCourseController,
                         labelText: "Idioma",
                         enabled: checkEnabledFields(),
@@ -151,7 +165,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
                       const SizedBox(height: 10,),
 
                       // Campo de la duración
-                      MyTextFormField(
+                      MyDataCourseField(
                         controller: _durationCourseController,
                         labelText: "Duración",
                         enabled: checkEnabledFields(),
@@ -173,15 +187,16 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
 
                       const SizedBox(height: 10,),
 
+                      // TODO: Cambiar el uid por el nombre del profesor
                       // Note - Debe cargarse por defecto el uid del profesor
                       // Campo del id del profesor
-                      MyTextFormField(
-                        controller: _teacherIDCourseController,
-                        labelText: "ID Profesor",
+                      MyDataCourseField(
+                        controller: _teacherNameController,
+                        labelText: "Nombre Profesor",
                         enabled: false,
                         onSaved: (value) {
                           if (value != null) {
-                            _teacherIDCourseController.text = value;
+                            _teacherNameController.text = value;
                           }
                         },
                         validator: (value) {
@@ -301,7 +316,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
         Map<String, dynamic> createdCourse = <String, dynamic>{
           "titulo": _titleCourseController.text.trim(),
           "duracion": _durationCourseController.text.trim(),
-          "profesor_id": _teacherIDCourseController.text.trim(),
+          "profesor_id": profesorID,
           "idioma": _languageCourseController.text.trim(),
           "imagenURL": imageURL,
         };
@@ -347,7 +362,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
         Map<String, dynamic> editedCourse = <String, dynamic>{
           "titulo": _titleCourseController.text.trim(),
           "duracion": _durationCourseController.text.trim(),
-          "profesor_id": _teacherIDCourseController.text.trim(),
+          "profesor_id": profesorID,
           "idioma": _languageCourseController.text.trim(),
           "imagenURL": imageURL,
         };

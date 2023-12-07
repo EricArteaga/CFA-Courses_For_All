@@ -36,8 +36,24 @@ class _SignedInState extends State<SignedIn> {
   @override
   Widget build(BuildContext context) {
 
-    // Declaración del Scaffold
-    return teacherScaffold();
+    // Scaffold del profesor
+    return FutureBuilder(
+      future: teacherScaffold(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+
+          // Cuando el Future está completo, se devuelve el  Scaffold
+          return snapshot.data as Widget;
+        } else {
+
+          // Mientras el Future no tiene el valor de vuelta, se muestra un
+          // indicador de carga
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+      },
+    );
   }
 
   // Método para quitar el usuario
@@ -55,17 +71,16 @@ class _SignedInState extends State<SignedIn> {
     );
   }
 
-  // TODO: Hacer que este scaffold solo te muestre tus cursos creados (profesor)
   // Método que te devuelve un scaffold con todos los cursos creados
-  Scaffold teacherScaffold(){
+  Future<Scaffold> teacherScaffold() async{
     return Scaffold(
       appBar: appBar(),
       backgroundColor: Colors.grey[300],
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: createFloatingActionButton(),
+      floatingActionButton: await createFloatingActionButton(),
       body: SafeArea(
         child: FutureBuilder(
-          future: getCursos(),
+          future: getCursos(user.uid),
           builder: ((context, snapshot){
             if(snapshot.hasData){
               return ListView.builder(
@@ -75,36 +90,57 @@ class _SignedInState extends State<SignedIn> {
                   // Variable que almacena el id del curso
                   final String id = snapshot.data![index]['id'];
 
-                  // Variable final curso de tipo "dynamic", que en verdad siempre será
-                  // un Map<String, dynamic>?
+                  // Variable final curso
                   final Map<String, dynamic> course = snapshot.data![index]['data'];
 
+                  // Variable del id del creador (profesor) del curso
+                  final String teacherCreatorID = course['profesor_id'];
+
                   // Componente con la información del curso
-                  return MyCourseTile(
-                    course: course,
-                    onTap: () async{
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => CourseViewScreen(
-                              screenState: "View",
-                              course: course,
-                          )));
+                  return FutureBuilder(
+                    future: getCreator(teacherCreatorID),
+                    builder: (context, snapshot) {
+                      if(snapshot.hasData) {
+                        return MyCourseTile(
+                          course: course,
+                          onTap: () async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>
+                                    CourseViewScreen(
+                                      screenState: "View",
+                                      course: course,
 
-                      // Se actualizan los datos cuando se vuelve a la página
-                      _reloadData();
-                    },
-                    editTapped: (context) async{
-                      await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => CourseViewScreen(
-                            screenState: "Edit",
-                            course: course,
-                            courseID: id,
-                          )));
+                                      // El snapshot trae el nombre del profesor
+                                      teacherName: snapshot.data!,
+                                    )));
 
-                      // Se actualizan los datos cuando se vuelve a la página
-                      _reloadData();
-                    },
+                            // Se actualizan los datos cuando se vuelve a la página
+                            _reloadData();
+                          },
+                          editTapped: (context) async {
+                            await Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>
+                                    CourseViewScreen(
+                                      screenState: "Edit",
+                                      course: course,
+                                      courseID: id,
+
+                                      // El snapshot trae nombre del profesor
+                                      teacherName: snapshot.data!,
+                                    )));
+
+                            // Se actualizan los datos cuando se vuelve a la página
+                            _reloadData();
+                          },
+                        );
+                      }else{
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                    }
                   );
                 }
               );
@@ -121,29 +157,56 @@ class _SignedInState extends State<SignedIn> {
   }
 
   // Método que devuelve un floatingActionButton para crear cursos
-  FloatingActionButton createFloatingActionButton(){
-    return FloatingActionButton(
-      shape: const CircleBorder(),
-      backgroundColor: Colors.green[500],
-      elevation: 30.0,
+  Future<FutureBuilder<String>> createFloatingActionButton() async{
+    return FutureBuilder(
+      future: getCreator(user.uid),
+      builder: (context, snapshot) {
+        if(snapshot.hasData) {
+          return FloatingActionButton(
+            shape: const CircleBorder(),
+            backgroundColor: Colors.green[500],
+            elevation: 30.0,
 
-      // Método que te abre la ventana de crear cursos
-      onPressed: () async{
-        await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) =>  CourseViewScreen(
-              screenState: "Create",
-              teacherID: _id,
+            // Método que te abre la ventana de crear cursos
+            onPressed: () async {
+              await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) =>
+                CourseViewScreen(
+                  screenState: "Create",
+                  teacherID: _id,
+
+                  // El snapshot es el nombre del profesor
+                  teacherName: snapshot.data!,
             )));
 
-        // Se actualizan los datos cuando se vuelve a la página
-        _reloadData();
-      },
+          // Se actualizan los datos cuando se vuelve a la página
+            _reloadData();
+          },
 
-      child: const Icon(Icons.add, size: 40,),
+          child: const Icon(Icons.add, size: 40,),
+          );
+        }else{
+          // No devuelve nada
+          return FloatingActionButton(
+            shape: const CircleBorder(),
+            backgroundColor: Colors.grey[500],
+            onPressed: (){},
+            child: const Icon(Icons.not_interested, size: 40,),
+          );
+        }
+        }
     );
   }
 
+  // Método que obtiene el nombre del profesor creador del curso
+  Future<String> getCreator(profesorID) async{
+    // Se saca de la base de datos el profesor creador del curso
+    Map<String, dynamic>? profesor = await getProfesorById(profesorID);
+    String nombre = profesor!["name"];
+    return nombre;
+  }
+  
   // Método para recargar los datos
   void _reloadData() async {
     // Se muestra el circulo de carga

@@ -105,6 +105,7 @@ class MyCourseTile extends StatelessWidget{
     MaterialPageRoute(builder: (context) => CourseViewScreen(
       screenState: "Edit",
       course: course,
+      teacherName: "",
     ));
   }
 

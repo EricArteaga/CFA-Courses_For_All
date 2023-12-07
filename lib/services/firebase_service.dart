@@ -63,12 +63,20 @@ Future<List> getProfesores() async{
 }
 
 // ? GET Profesor By ID
-Future<Map<String, dynamic>?> getProfesorById(String teacherID) async {
-  dynamic profesor;
-  DocumentSnapshot profesorSnapshot = await db
-      .collection('profesor')
-      .doc(teacherID)
-      .get();
+Future<Map<String, dynamic>?> getProfesorById(String? teacherID) async {
+  CollectionReference collectionReferenceProfesor = db.collection('profesor');
+
+
+  DocumentSnapshot profesorSnapshot;
+  if (teacherID != null) {
+    profesorSnapshot = await collectionReferenceProfesor
+        .doc(teacherID)
+        .get();
+  } else {
+    profesorSnapshot = await collectionReferenceProfesor
+        .doc("falloAPosta") // Hacemos que falle para que devuelva null
+        .get();
+  }
 
   if (profesorSnapshot.exists) {
     // El profesor existe, devuelve sus datos como un mapa
@@ -101,7 +109,7 @@ Future<void> deleteProfesor(String id) async{
 // End CRUD de la colección Profesor
 // Region CRUD de la colección Curso
 // ? GET Cursos
-Future<List<Map<String, dynamic>>> getCursos({String? teacherID}) async{
+Future<List<Map<String, dynamic>>> getCursos([String? teacherID]) async{
   List<Map<String, dynamic>> cursos = [];
   CollectionReference collectionReferenceCursos = db.collection('curso');
 
@@ -109,8 +117,12 @@ Future<List<Map<String, dynamic>>> getCursos({String? teacherID}) async{
   // de then, recogiendo ese valor y creando una función donde se recorre los
   // resultados del get() con un forEach()
   QuerySnapshot querySnapshot;
+
+  // Si hay un id del profesor se recogen los cursos de ese profesor
   if (teacherID != null) {
     querySnapshot = await collectionReferenceCursos.where('profesor_id', isEqualTo: teacherID).get();
+
+  // Si no, se recogen todos los cursos
   } else {
     querySnapshot = await collectionReferenceCursos.get();
   }
@@ -123,7 +135,7 @@ Future<List<Map<String, dynamic>>> getCursos({String? teacherID}) async{
   }).toList();
 
   // Retardamos la petición para que aparezca el circulo de carga
-  await Future.delayed(const Duration(seconds: 1));
+  await Future.delayed(const Duration(milliseconds: 500));
 
   return cursos;
 }
