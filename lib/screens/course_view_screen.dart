@@ -310,7 +310,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
          * Se sube la imagen al storage y se obtiene la url de donde está, para
          * pasarlo como parametro al curso.
          */
-        String? imageURL = await uploadImage(_selectedImageFile);
+        String? imageURL = await uploadCourseImage(_selectedImageFile);
 
         // Creamos un mapa que guarda los campos
         Map<String, dynamic> createdCourse = <String, dynamic>{
@@ -353,7 +353,7 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
         String? imageURL;
         // Se comprueba si se ha seleccionado una imagen y se guarda
         if(_selectedImageFile != null){
-          imageURL = await uploadImage(_selectedImageFile);
+          imageURL = await uploadCourseImage(_selectedImageFile);
 
         // Si no, se guarda la que ya estaba
         } else{

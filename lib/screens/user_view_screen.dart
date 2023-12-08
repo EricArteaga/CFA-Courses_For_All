@@ -319,7 +319,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
           String? imageURL;
           // Se comprueba si se ha seleccionado una imagen y se guarda
           if (_selectedImageFile != null) {
-            imageURL = await uploadImage(_selectedImageFile);
+            imageURL = await uploadUserImage(_selectedImageFile);
 
             // Si no, se guarda la que ya estaba
           } else {

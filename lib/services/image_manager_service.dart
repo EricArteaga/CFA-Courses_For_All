@@ -12,8 +12,9 @@ Future<XFile?> getImage() async{
   return image;
 }
 
-// Método con te sube la imagen a Firebase storage y te devuelve su URL
-Future<String?> uploadImage( File? image) async{
+// Método con te sube la imagen a Firebase storage a una carpeta "cursos" y te
+// devuelve su URL
+Future<String?> uploadCourseImage( File? image) async{
 
   if(image != null){
     // Acortamos la ruta a el nombre de la imagen unicamente
@@ -23,6 +24,34 @@ Future<String?> uploadImage( File? image) async{
     final Reference ref = storage
         .ref()
         .child("cursos")
+        .child(nameFile);
+    final UploadTask uploadTask = ref.putFile(image);
+
+    // Se sube a Firebase storage
+    final TaskSnapshot snapshot = await uploadTask.whenComplete(() => true);
+
+    // Se obtiene su url
+    final String url = await snapshot.ref.getDownloadURL();
+
+    if(snapshot.state == TaskState.success) {
+      return url;
+    }
+  }
+  return '';
+}
+
+// Método con te sube la imagen a Firebase storage a una carpeta "usuarios" y te
+// devuelve su URL
+Future<String?> uploadUserImage( File? image) async{
+
+  if(image != null){
+    // Acortamos la ruta a el nombre de la imagen unicamente
+    final String nameFile = image.path.split("/").last;
+
+    // Se construye la referencia al lugar donde se guarda
+    final Reference ref = storage
+        .ref()
+        .child("usuarios")
         .child(nameFile);
     final UploadTask uploadTask = ref.putFile(image);
 
