@@ -147,6 +147,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
                     MyTextFormField(
                       controller: _userEmailController,
                       labelText: "Email",
+                      enabled: false,
                       onSaved: (value) {
                         if (value != null) {
                           _userEmailController.text = value;
@@ -165,9 +166,11 @@ class _UserViewScreenState extends State<UserViewScreen> {
 
                     const SizedBox(height: 10,),
 
+                    // Campo contraseña
                     MyTextFormField(
                       controller: _userPasswordController,
                       labelText: "Contraseña",
+                      enabled: false,
                       obscureText: true,
                       onSaved: (value) {
                         if (value != null) {
@@ -192,7 +195,6 @@ class _UserViewScreenState extends State<UserViewScreen> {
                     MyTextFormField(
                       controller: _confirmUserPasswordController,
                       labelText: "Confirmar contraseña",
-                      obscureText: true,
                       onSaved: (value) {
                         if (value != null) {
                           _confirmUserPasswordController.text = value;
@@ -297,12 +299,12 @@ class _UserViewScreenState extends State<UserViewScreen> {
       // Se comprueban las contraseñas
       if ((_userPasswordController.text == "") ||
           (_confirmUserPasswordController.text == "") ||
-          (_userPasswordController.text != _confirmUserPasswordController.text)) {
+          (_userPasswordController.text.trim() != _confirmUserPasswordController.text.trim())) {
         Navigator.pop(context);
         dontMatchPasswordsMessage();
 
       // Se comprueba que la contraseña no sea debil
-      } else if(_userPasswordController.text.length > 6){
+      } else if(_userPasswordController.text.length < 6){
         Navigator.pop(context);
         weakPasswordMessage();
 
