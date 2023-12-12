@@ -412,7 +412,6 @@ class _SignedInState extends State<SignedIn> {
 
   // Método para eliminar el curso
   void deleteUser() async{
-    // TODO: Implementar Pop up de la confirmación de la operación elimnar
     bool confirmedDelete = await confirmDeleteUserMessage(context);
 
     if(confirmedDelete) {
@@ -470,7 +469,7 @@ class _SignedInState extends State<SignedIn> {
     Navigator.pop(context);
   }
 
-  // Mensaje de campos obligatorios
+  // Mensaje de error desconocido
   void unknownErrorMessage(){
     showDialog(
         context: context,

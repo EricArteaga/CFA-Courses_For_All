@@ -176,6 +176,9 @@ Future<void> updateCurso(String id, Map<String, dynamic> curso) async{
   collectionReferenceCurso
       .doc(id)
       .update(curso);
+
+  // Retardamos la petición para que aparezca el circulo de carga
+  await Future.delayed(const Duration(milliseconds: 500));
 }
 
 //? DELETE Curso

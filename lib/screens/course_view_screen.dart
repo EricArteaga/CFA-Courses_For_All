@@ -5,6 +5,7 @@ import 'package:cfa_coursesforall/components/my_image_field.dart';
 import 'package:flutter/material.dart';
 
 import '../components/my_button.dart';
+import '../components/my_wrong_message.dart';
 import '../services/firebase_service.dart';
 import '../services/image_manager_service.dart';
 
@@ -327,7 +328,10 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
          * el curso
          */
         await createCurso(createdCourse);
+        Navigator.pop(context);
+        Navigator.pop(context);
       } catch (e) {
+        Navigator.pop(context);
         print("Error: ${e.toString()}");
       }
     }
@@ -377,12 +381,15 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
          */
         await updateCurso(courseID!, editedCourse);
         Navigator.pop(context);
+        Navigator.pop(context);
 
       } catch (e) {
-        print("Error: ${e.toString()}");
+        Navigator.pop(context);
+        unknownErrorMessage();
       }
     }
   }
+
 
   // Método que te carga los datos del curso
   Future downloadCourseValues() async{
@@ -399,4 +406,20 @@ class _CourseViewScreenState extends State<CourseViewScreen> {
     }
   }
 
+  // Region Mensajes de error
+  // Mensaje de error desconocido
+  void unknownErrorMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Error desconocido",
+              content: "No se ha podido realizar la operación por un error"
+                  "desconocido"
+          );
+        }
+    );
+  }
+
+  // End Mensajes de error
 }

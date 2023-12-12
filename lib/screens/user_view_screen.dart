@@ -195,6 +195,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
                     MyTextFormField(
                       controller: _confirmUserPasswordController,
                       labelText: "Confirmar contraseña",
+                      obscureText: true,
                       onSaved: (value) {
                         if (value != null) {
                           _confirmUserPasswordController.text = value;
@@ -315,9 +316,9 @@ class _UserViewScreenState extends State<UserViewScreen> {
       } else {
         try {
           /*
-         * Se sube la imagen al storage y se obtiene la url de donde está, para
-         * pasarlo como parametro al curso.
-         */
+           * Se sube la imagen al storage y se obtiene la url de donde está, para
+           * pasarlo como parametro al curso.
+           */
           String? imageURL;
           // Se comprueba si se ha seleccionado una imagen y se guarda
           if (_selectedImageFile != null) {
@@ -337,17 +338,20 @@ class _UserViewScreenState extends State<UserViewScreen> {
           };
 
           /*
-         * Se actualiza en la colección del tipo de usuario un usuario con sus datos
-         * del fomulario
-         */
-          if (widget.userType == "profesor") {
+           * Se actualiza en la colección del tipo de usuario un usuario con sus datos
+           * del fomulario
+           */
+          if (widget.userType == "profesor")
+          {
             Navigator.pop(context);
             await updateProfesor(user.uid, editedUser);
-
-            // widget.userType == "alumno"
-          } else {
+            Navigator.pop(context);
+          }
+          else // widget.userType == "alumno"
+          {
             Navigator.pop(context);
             await updateAlumno(user.uid, editedUser);
+            Navigator.pop(context);
           }
           String uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -369,6 +373,7 @@ class _UserViewScreenState extends State<UserViewScreen> {
     }
   }
 
+  // Region Mensajes de error
   // Método para comprobar si el email es correto
   bool validateEmail(String value) {
     Pattern pattern =
@@ -429,4 +434,5 @@ class _UserViewScreenState extends State<UserViewScreen> {
     );
   }
 
+  // End Mensajes de error
 }
