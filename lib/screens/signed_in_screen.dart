@@ -189,7 +189,6 @@ class _SignedInState extends State<SignedIn> {
       };
     }
 
-
   }
 
   // Método que devuelve un floatingActionButton para crear cursos
@@ -347,12 +346,11 @@ class _SignedInState extends State<SignedIn> {
   Drawer userDrawer(){
     return Drawer(
       backgroundColor: Colors.grey[300],
-      child: ListView(
+      child: Column(
         children: [
+
+          // Logo + email
           DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.grey,
-            ),
             child: Column(
               children: [
 
@@ -366,16 +364,20 @@ class _SignedInState extends State<SignedIn> {
                 Text(
                   user.email ?? '',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 16.0,
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(),
+
+          //const Divider(),
+
+          // Botón gestionar cuenta
           ListTile(
-            title: Text('Gestionar cuenta'),
+            leading: const Icon(Icons.edit),
+            title: const Text('Gestionar cuenta'),
             onTap: () async{
               await Navigator.of(context).push(
                 MaterialPageRoute(
@@ -388,9 +390,59 @@ class _SignedInState extends State<SignedIn> {
               });
             },
           ),
+
+
+          Expanded(child: Container()),
+          const Divider(),
+
+          // Botón eliminar cuenta
+          ListTile(
+
+            leading: const Icon(Icons.person_off),
+            title: const Text('Eliminar cuenta',
+              style: TextStyle(color:  Colors.redAccent)),
+            onTap: () async{
+              deleteUser();
+            },
+          ),
         ],
       ),
     );
+  }
+
+  // Método para eliminar el curso
+  void deleteUser() async{
+    // TODO: Implementar Pop up de la confirmación de la operación elimnar
+    bool confirmedDelete = await confirmDeleteUserMessage(context);
+
+    if(confirmedDelete) {
+
+      // Se obtiene el tipo de usuario
+      String userTypeForDelete = await getUserType(user.uid);
+
+      try {
+
+        // Se borra de la colección al que pertenezca el usuario
+        if (userTypeForDelete == "profesor") {
+          // Se borra el usuario de Authentication
+          await FirebaseAuth.instance.currentUser?.delete();
+
+          deleteProfesor(user.uid);
+
+        } else if (userTypeForDelete == "alumno") {
+          // Se borra el usuario de Authentication
+          await FirebaseAuth.instance.currentUser?.delete();
+
+          deleteAlumno(user.uid);
+        }
+      }on FirebaseAuthException catch (e){
+        if(e.code == "requires-recent-login"){
+          requiresRecentLoginMessage();
+        }else {
+          unknownErrorMessage();
+        }
+      }
+    }
   }
 
   // Método que obtiene el nombre del profesor creador del curso
@@ -427,6 +479,18 @@ class _SignedInState extends State<SignedIn> {
               title: "Error desconocido",
               content: "No se ha podido realizar la operación por un error "
                   "desconocido"
+          );
+        }
+    );
+  }
+
+  void requiresRecentLoginMessage(){
+    showDialog(
+        context: context,
+        builder: (context) {
+          return const MyWrongMessage(
+              title: "Error inicio de sesión reciente requerido",
+              content: "Se requiere haber iniciado sesión recientemente",
           );
         }
     );
